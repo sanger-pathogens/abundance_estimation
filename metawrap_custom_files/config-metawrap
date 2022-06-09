@@ -1,0 +1,18 @@
+# Paths to custon pipelines and scripts of metaWRAP
+mw_path=/opt/metaWRAP/bin
+SOFT=/opt/metaWRAP/bin/metawrap-scripts
+PIPES=/opt/metaWRAP/bin/metawrap-modules
+
+# OPTIONAL databases (see 'Databases' section of metaWRAP README for details)
+# Path to kraken standard database
+KRAKEN_DB=${KRAKEN_DB:-/lustre/scratch118/infgen/pathogen/pathpipe/kraken/pi_qc_complete_2015521}
+
+# Path to indexed human genome (see metaWRAP website for guide). This includes files hg38.bitmask and hg38.srprism.*
+BMTAGGER_DB=${BMTAGGER_DB:-/lustre/scratch118/infgen/pathogen/pathpipe/BMTAGGER_INDEX}
+
+# Paths to BLAST databases.
+# This has to be the NT v4 database.
+BLASTDB=${BLASTDB_NT:-/lustre/scratch118/infgen/pathogen/pathpipe/blastdb/NT_v4}
+
+# Path to the NCBI_tax (taxonomy) database
+TAXDUMP=${TAXDUMP:-/lustre/scratch118/infgen/pathogen/pathpipe/metaWRAP/NCBI_tax_20210320}

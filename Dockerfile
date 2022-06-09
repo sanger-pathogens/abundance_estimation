@@ -59,6 +59,44 @@ ENV PATH $PATH:/opt/bowtie2
 ############# INSTRAIN ################
 RUN pip install boto3 && pip install instrain==${INSTRAIN_VERSION}
 
+############# METAWRAP CUSTOM INSTALL ################
+SHELL ["/bin/bash", "-c"]
+
+# Install Miniconda package manager.
+RUN wget -q -P /tmp \
+  https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && bash /tmp/Miniconda3-latest-Linux-x86_64.sh -b -p /opt/conda \
+    && rm /tmp/Miniconda3-latest-Linux-x86_64.sh
+
+ENV PATH="/opt/conda/bin:$PATH"
+
+# Install mamba
+RUN conda install -y -c conda-forge mamba
+
+WORKDIR /opt
+# download metaWRAP
+RUN git clone https://github.com/bxlab/metaWRAP.git
+ENV PATH="/opt/metaWRAP/bin:$PATH"
+
+# custom trim-galore version
+RUN sed -i 's|trim-galore 0.5.0|trim-galore 0.6.7|g' /opt/metaWRAP/conda_pkg/meta.yaml
+
+# custom read_qc script
+COPY metawrap_custom_files/read_qc.sh /opt/metaWRAP/bin/metawrap-modules
+
+# custom config
+COPY metawrap_custom_files/config-metawrap /opt/metaWRAP/bin
+
+RUN mamba create -y -n metawrap-env python=2.7 && \
+    source /opt/conda/etc/profile.d/conda.sh && \
+    source ~/.bashrc && \
+    conda activate metawrap-env && \
+    conda config --add channels defaults && \
+    conda config --add channels conda-forge && \
+    conda config --add channels bioconda && \
+    conda config --add channels ursky && \
+    mamba install --only-deps -c ursky metawrap-mg
+
 ############ TIDY UP ###################
 RUN   apt-get remove -y build-essential autoconf automake && \
       apt-get clean && \
