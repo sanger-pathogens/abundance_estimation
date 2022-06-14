@@ -2,6 +2,8 @@
 
 nextflow.enable.dsl = 2
 
+include { metawrap_qc } from './modules/metawrap_qc.nf'
+
 def validate_parameters() {
     // Parameter checking function
     def errors = 0
@@ -148,7 +150,8 @@ workflow {
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
     genome_file = Channel.fromPath(params.genome_file)
     stb_file = Channel.fromPath(params.stb_file)
-    bowtie2samtools(fastq_path_ch, params.btidx, params.bowtie2_samtools_threads)
+    metawrap_qc(fastq_path_ch)
+    bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
     if (params.full_output.toString() == "1") {
         instrain_full_output(bowtie2samtools.out.bam_file, genome_file, stb_file, params.instrain_threads)
     }
