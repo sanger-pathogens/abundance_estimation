@@ -64,12 +64,14 @@ def validate_parameters() {
             log.error("Please specify the full instrain output as true or false using the --full_output option.")
             errors += 1
         }
+    }
 
     if (params.cleanup) {
         if (!true_false_list.any { it.contains(params.cleanup.toString()) }) {
             log.error("Please specify the cleanup option as true or false using the --cleanup option.")
             errors += 1
         }
+    }
 
     if (params.skip_qc) {
         if (!true_false_list.any { it.contains(params.skip_qc.toString()) }) {
