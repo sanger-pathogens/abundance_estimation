@@ -10,9 +10,9 @@ nextflow run abundance_estimation.nf
   --bowtie2_samtools_threads   threads - default: 16 (optional)
   --instrain_threads           threads - default: 16 (optional)
   --full_output                get full instrain output - default false, use true if full output required (optional)
-  --skip_qc                    skip metawrap qc step - default false, use true if qc is not needed
-  --cleanup                    cleanup intermediate files - default true, use false if cleanup is not wanted
-  -profile                     always use sanger_lsf when running on the farm
+  --skip_qc                    skip metawrap qc step - default false, use true if qc is not needed (optional)
+  --cleanup                    cleanup intermediate files - default true, use false if cleanup is not wanted (optional)
+  -profile                     always use sanger_lsf when running on the farm (mandatory)
 ```
 
 ## Generating manifests
