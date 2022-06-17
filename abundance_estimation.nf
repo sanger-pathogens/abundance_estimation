@@ -142,7 +142,7 @@ process instrain {
     genome_info_file="${sample_id}_genome_info.tsv"
     workdir="workdir.txt"
     """
-    echo $PWD > workdir.txt
+    pwd > workdir.txt
     inStrain profile $sorted_bam $genome_file -o $sample_id -p $threads -s $stb_file --database_mode --skip_plot_generation
     mv ${sample_id}/output/${sample_id}"_genome_info.tsv" .
     """
