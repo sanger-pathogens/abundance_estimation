@@ -3,6 +3,9 @@
 nextflow.enable.dsl = 2
 
 include { metawrap_qc } from './modules/metawrap_qc.nf'
+include { cleanup_sorted_bam_files } from './modules/cleanup.nf'
+include { cleanup_trimmed_fastq_files } from './modules/cleanup.nf'
+include { cleanup_instrain_output } from './modules/cleanup.nf'
 
 def validate_parameters() {
     // Parameter checking function
@@ -54,10 +57,23 @@ def validate_parameters() {
         log.error("Please specify the number of threads for bowtie2samtools using the --bowtie2_samtools_threads option")
         errors += 1
     }
-    def output_list = ["0", "1"]
+
+    def true_false_list = ["true", "false"]
     if (params.full_output) {
-        if (!output_list.any { it.contains(params.full_output.toString()) }) {
-            log.error("Please specify the output as 0 or 1 using the --type option.")
+        if (!true_false_list.any { it.contains(params.full_output.toString()) }) {
+            log.error("Please specify the full instrain output as true or false using the --full_output option.")
+            errors += 1
+        }
+
+    if (params.cleanup) {
+        if (!true_false_list.any { it.contains(params.cleanup.toString()) }) {
+            log.error("Please specify the cleanup option as true or false using the --cleanup option.")
+            errors += 1
+        }
+
+    if (params.skip_qc) {
+        if (!true_false_list.any { it.contains(params.skip_qc.toString()) }) {
+            log.error("Please specify the skip_qc option as true or false using the --skip_qc option.")
             errors += 1
         }
     }
@@ -100,6 +116,7 @@ process bowtie2samtools {
 
     output:
     tuple val(sample_id), path("${sample_id}.sorted.bam"), emit: bam_file
+    tuple val(sample_id), path(first_read), path(second_read), emit: trimmed_fastqs
 
     script:
     """
@@ -108,19 +125,24 @@ process bowtie2samtools {
 }
 
 process instrain {
-    publishDir "${params.results_dir}", mode: 'copy', overwrite: true
+    publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.tsv"
     input:
     tuple val(sample_id), file(sorted_bam)
-    file(genome_file)
-    file(stb_file)
+    val genome_file
+    val stb_file
     val threads
 
     output:
     path("${genome_info_file}")
+    path(sorted_bam), emit: sorted_bam
+    path("${workdir}"), emit: workdir
+    val sample_id, emit: sample_id
 
     script:
     genome_info_file="${sample_id}_genome_info.tsv"
+    workdir="workdir.txt"
     """
+    echo $PWD > workdir.txt
     inStrain profile $sorted_bam $genome_file -o $sample_id -p $threads -s $stb_file --database_mode --skip_plot_generation
     mv ${sample_id}/output/${sample_id}"_genome_info.tsv" .
     """
@@ -130,8 +152,8 @@ process instrain_full_output {
     publishDir "${params.results_dir}", mode: 'copy', overwrite: true
     input:
     tuple val(sample_id), file(sorted_bam)
-    file(genome_file)
-    file(stb_file)
+    val genome_file
+    val stb_file
     val threads
 
     output:
@@ -148,14 +170,27 @@ workflow {
     manifest_ch = Channel.fromPath(params.manifest)
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
-    genome_file = Channel.fromPath(params.genome_file)
-    stb_file = Channel.fromPath(params.stb_file)
-    metawrap_qc(fastq_path_ch)
-    bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
-    if (params.full_output.toString() == "1") {
-        instrain_full_output(bowtie2samtools.out.bam_file, genome_file, stb_file, params.instrain_threads)
+    if (params.skip_qc) {
+        bowtie2samtools(fastq_path_ch, params.btidx, params.bowtie2_samtools_threads)
     }
     else {
-        instrain(bowtie2samtools.out.bam_file, genome_file, stb_file, params.instrain_threads)
+        metawrap_qc(fastq_path_ch)
+        bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
+    }
+    if (params.cleanup) {
+        if (!params.skip_qc) {
+            cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
+        }
+    }
+    if (params.full_output) {
+        // presuming if you are using full output, it is for debugging purposes, so no clean up
+        instrain_full_output(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
+    }
+    else {
+        instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
+        if (params.cleanup) {
+            cleanup_sorted_bam_files(instrain.out.sorted_bam)
+            cleanup_instrain_output(instrain.out.workdir, instrain.out.sample_id)
+        }
     }
 }
