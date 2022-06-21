@@ -9,7 +9,7 @@ process cleanup_sorted_bam_files {
     script:
         """
         # Remove sorted bam files
-        orig_bam=\$(readlink ${sorted_bam_file})
+        orig_bam=\$(readlink -f ${sorted_bam_file})
         rm ${sorted_bam_file} # Remove symlink
         rm \${orig_bam} # Remove original files
         """
@@ -26,7 +26,7 @@ process cleanup_trimmed_fastq_files {
     script:
         """
         # Remove trimmed fastq files
-        orig_fastqs=\$(readlink ${first_read} ${second_read})
+        orig_fastqs=\$(readlink -f ${first_read} ${second_read})
         rm ${first_read} ${second_read} # Remove symlink
         rm \${orig_fastqs} # Remove original files
         """

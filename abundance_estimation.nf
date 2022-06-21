@@ -58,28 +58,6 @@ def validate_parameters() {
         errors += 1
     }
 
-    def true_false_list = ["true", "false"]
-    if (params.full_output) {
-        if (!true_false_list.any { it.contains(params.full_output.toString()) }) {
-            log.error("Please specify the full instrain output as true or false using the --full_output option.")
-            errors += 1
-        }
-    }
-
-    if (params.cleanup) {
-        if (!true_false_list.any { it.contains(params.cleanup.toString()) }) {
-            log.error("Please specify the cleanup option as true or false using the --cleanup option.")
-            errors += 1
-        }
-    }
-
-    if (params.skip_qc) {
-        if (!true_false_list.any { it.contains(params.skip_qc.toString()) }) {
-            log.error("Please specify the skip_qc option as true or false using the --skip_qc option.")
-            errors += 1
-        }
-    }
-
     if (params.instrain_threads) {
         if (!params.instrain_threads.toString().isInteger()) {
         log.error("Please ensure the instrain_threads parameter is a number")
@@ -179,7 +157,7 @@ workflow {
         metawrap_qc(fastq_path_ch)
         bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
     }
-    if (params.cleanup) {
+    if (params.cleanup && !params.no_cleanup) {
         if (!params.skip_qc) {
             cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
         }
@@ -190,7 +168,7 @@ workflow {
     }
     else {
         instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
-        if (params.cleanup) {
+        if (params.cleanup && !params.no_cleanup) {
             cleanup_sorted_bam_files(instrain.out.sorted_bam)
             cleanup_instrain_output(instrain.out.workdir, instrain.out.sample_id)
         }

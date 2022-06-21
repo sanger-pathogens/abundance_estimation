@@ -11,7 +11,8 @@ nextflow run abundance_estimation.nf
   --instrain_threads           threads - default: 16 (optional)
   --full_output                get full instrain output - default false, use true if full output required (optional)
   --skip_qc                    skip metawrap qc step - default false, use true if qc is not needed (optional)
-  --cleanup                    cleanup intermediate files - default true, use false if cleanup is not wanted (optional)
+  --cleanup                    cleanup intermediate files - default true, use --no_cleanup if cleanup is not wanted (optional)
+  --no_cleanup                 don't cleanup intermediate files - default false (optional)
   -profile                     always use sanger_lsf when running on the farm (mandatory)
 ```
 
@@ -24,3 +25,7 @@ Generate manifest:
 `./generate_manifest.sh fastq_paths.txt`
 
 This will output the manifest to `manifest.csv` which can be fed into the nextflow pipeline
+
+## Development
+For development, smaller test databases are available, these will significantly reduce the run time and resource requirements:
+8 CPUs and 50GB memory will be sufficient
