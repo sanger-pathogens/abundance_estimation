@@ -157,7 +157,7 @@ workflow {
         metawrap_qc(fastq_path_ch)
         bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
     }
-    if (params.cleanup && !params.no_cleanup) {
+    if (!params.no_cleanup) {
         if (!params.skip_qc) {
             cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
         }
@@ -168,7 +168,7 @@ workflow {
     }
     else {
         instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
-        if (params.cleanup && !params.no_cleanup) {
+        if (!params.no_cleanup) {
             cleanup_sorted_bam_files(instrain.out.sorted_bam)
             cleanup_instrain_output(instrain.out.workdir, instrain.out.sample_id)
         }
