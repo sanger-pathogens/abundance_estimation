@@ -11,7 +11,6 @@ nextflow run abundance_estimation.nf
   --instrain_threads           threads - default: 16 (optional)
   --full_output                get full instrain output - default false, use true if full output required (optional)
   --skip_qc                    skip metawrap qc step - default false, use true if qc is not needed (optional)
-  --cleanup                    cleanup intermediate files - default true, use --no_cleanup if cleanup is not wanted (optional)
   --no_cleanup                 don't cleanup intermediate files - default false (optional)
   -profile                     always use sanger_lsf when running on the farm (mandatory)
 ```
