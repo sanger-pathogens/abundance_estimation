@@ -28,3 +28,13 @@ This will output the manifest to `manifest.csv` which can be fed into the nextfl
 ## Development
 For development, smaller test databases are available, these will significantly reduce the run time and resource requirements:
 8 CPUs and 50GB memory will be sufficient
+
+## Dependencies
+This pipeline relies on the following modules:
+```
+bowtie2/2.3.5--py37he860b03_0
+instrain/1.5.4
+samtools/1.9
+metawrap_custom/1.3.2-c4
+nextflow/22.04.0-5697
+```
