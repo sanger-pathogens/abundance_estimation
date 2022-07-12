@@ -9,10 +9,15 @@ nextflow run abundance_estimation.nf
   --stb_file                   stb file - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.stb
   --bowtie2_samtools_threads   threads - default: 16 (optional)
   --instrain_threads           threads - default: 16 (optional)
-  --full_output                get full instrain output - default false, use true if full output required (optional)
-  --skip_qc                    skip metawrap qc step - default false, use true if qc is not needed (optional)
-  --no_cleanup                 don't cleanup intermediate files - default false (optional)
+  --instrain_full_output       get full instrain output - default false (optional)
+  --keep_metawrap_qc           don't cleanup metawrap_qc output - default false (optional)
+  --keep_bowtie2samtools       don't cleanup bowtie2samtools output - default false (optional)
+  --keep_instrain              don't cleanup instrain output - default false (optional)
+  --skip_qc                    skip metawrap qc step - default false (optional)
+  --instrain_queue             job queue for instrain - default normal (optional)
+  --bowtie2samtools_queue      job queue for bowtie2samtools - default normal (optional)
   -profile                     always use sanger_lsf when running on the farm (mandatory)
+  --help                       print this help message (optional)
 ```
 
 ## Generating manifests
