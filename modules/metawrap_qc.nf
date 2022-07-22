@@ -9,6 +9,6 @@ process metawrap_qc {
     read_1 = "${sample_id}_clean_1.fastq.gz"
     read_2 = "${sample_id}_clean_2.fastq.gz"
     """
-    metawrap read_qc -1 $first_read -2 $second_read -o .
+    conda run -n metawrap-env metawrap read_qc -1 $first_read -2 $second_read -o .
     """
 }
