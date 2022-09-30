@@ -37,7 +37,7 @@ def validate_parameters() {
     def errors = 0
 
     if (params.manifest) {
-        manifest=file(params.manifest)
+        manifest = file(params.manifest)
         if (!manifest.exists()) {
             log.error("The manifest file specified does not exist.")
             errors += 1
@@ -49,7 +49,7 @@ def validate_parameters() {
     }
 
     if (params.genome_file) {
-        genome_file=file(params.genome_file)
+        genome_file = new File(params.db_folder, params.genome_file)
         if (!genome_file.exists()) {
             log.error("The genome file specified does not exist.")
             errors += 1
@@ -61,7 +61,7 @@ def validate_parameters() {
     }
 
     if (params.stb_file) {
-        stb_file=file(params.stb_file)
+        stb_file = new File(params.db_folder, params.stb_file)
         if (!stb_file.exists()) {
             log.error("The stb file specified does not exist.")
             errors += 1
@@ -186,12 +186,16 @@ workflow {
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
 
+    btidx = sprintf("%s/%s", params.tmp_folder, params.btidx)
+    genome_file = sprintf("%s/%s", params.tmp_folder, params.genome_file)
+    stb_file = sprintf("%s/%s", params.tmp_folder, params.stb_file)
+
     if (params.skip_qc) {
-        bowtie2samtools(fastq_path_ch, params.btidx, params.bowtie2_samtools_threads)
+        bowtie2samtools(fastq_path_ch, btidx, params.bowtie2_samtools_threads)
     }
     else {
         metawrap_qc(fastq_path_ch)
-        bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
+        bowtie2samtools(metawrap_qc.out.trimmed_fastqs, btidx, params.bowtie2_samtools_threads)
     }
 
     if (!params.keep_metawrap_qc) {
@@ -200,7 +204,7 @@ workflow {
         }
     }
 
-    instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
+    instrain(bowtie2samtools.out.bam_file, genome_file, stb_file, params.instrain_threads)
 
     if (!params.keep_bowtie2samtools) {
         cleanup_sorted_bam_files(instrain.out.sorted_bam)
