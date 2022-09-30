@@ -1,5 +1,6 @@
 #!/usr/bin/env nextflow
 
+import java.nio.file.Files
 nextflow.enable.dsl = 2
 
 include { metawrap_qc } from './modules/metawrap_qc.nf'
@@ -111,6 +112,21 @@ def validate_parameters() {
         }
 }
 
+def copy_db_to_tmp(input_folder) {
+    tmp_folder = new File(params.tmp_folder)
+    if (!tmp_folder.exists()) {
+        tmp_folder.mkdirs()
+    }
+
+    folder = new File(input_folder)
+    folder.traverse{
+        def output_file = new File(tmp_folder, it.name)
+        if (!output_file.exists()) {
+            println(sprintf("Copying %s to %s", it.name, output_file))
+            Files.copy(it.toPath(), output_file.toPath())
+        }
+    }
+}
 
 process bowtie2samtools {
     input:
@@ -164,9 +180,12 @@ workflow {
         exit 0
     }
     validate_parameters()
+    copy_db_to_tmp(params.db_folder)
+
     manifest_ch = Channel.fromPath(params.manifest)
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
+
     if (params.skip_qc) {
         bowtie2samtools(fastq_path_ch, params.btidx, params.bowtie2_samtools_threads)
     }
@@ -174,15 +193,19 @@ workflow {
         metawrap_qc(fastq_path_ch)
         bowtie2samtools(metawrap_qc.out.trimmed_fastqs, params.btidx, params.bowtie2_samtools_threads)
     }
+
     if (!params.keep_metawrap_qc) {
         if (!params.skip_qc) {
             cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
         }
     }
+
     instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
+
     if (!params.keep_bowtie2samtools) {
         cleanup_sorted_bam_files(instrain.out.sorted_bam)
     }
+
     if (!params.keep_instrain) {
         cleanup_instrain_output(instrain.out.workdir, instrain.out.sample_id)
     }
