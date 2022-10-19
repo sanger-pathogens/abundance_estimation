@@ -130,18 +130,34 @@ def copy_db_to_tmp(input_folder) {
 
 process bowtie2samtools {
     input:
-    tuple val(sample_id), file(first_read), file(second_read)
-    val btidx
-    val threads
+        tuple val(sample_id), file(first_read), file(second_read)
+        val btidx
+        val threads
 
     output:
-    tuple val(sample_id), path("${sample_id}.sorted.bam"), emit: bam_file
-    tuple val(sample_id), path(first_read), path(second_read), emit: trimmed_fastqs
+        tuple val(sample_id), path("${sample_id}.sorted.bam"), emit: bam_file
+        tuple val(sample_id), path(first_read), path(second_read), emit: trimmed_fastqs
 
     script:
-    """
-    bowtie2 -p $threads -x $btidx -1 $first_read -2 $second_read | samtools sort -@ $threads -o ${sample_id}".sorted.bam"
-    """
+        """
+        bowtie2 -p $threads -x $btidx -1 $first_read -2 $second_read | samtools sort -@ $threads -o ${sample_id}".sorted.bam"
+        """
+}
+
+workflow BOWTIE2SAMTOOLS {
+    take:
+        fastqs
+        threads
+
+    main:
+        btidx = "${params.tmp_folder}/${params.btidx}"
+        // Copy files to /tmp
+        Channel.fromPath("${params.db_folder}/${params.btidx}*").subscribe { copy_db_to_tmp(it) }
+        bowtie2samtools(fastqs, btidx, threads)
+
+    emit:
+        bam_file = bowtie2samtools.out.bam_file
+        trimmed_fastqs = bowtie2samtools.out.trimmed_fastqs
 }
 
 process instrain {
@@ -186,25 +202,21 @@ workflow {
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
 
-    btidx = sprintf("%s/%s", params.tmp_folder, params.btidx)
-    genome_file = sprintf("%s/%s", params.tmp_folder, params.genome_file)
-    stb_file = sprintf("%s/%s", params.tmp_folder, params.stb_file)
-
     if (params.skip_qc) {
-        bowtie2samtools(fastq_path_ch, btidx, params.bowtie2_samtools_threads)
+        BOWTIE2SAMTOOLS(fastq_path_ch, params.bowtie2_samtools_threads)
     }
     else {
         metawrap_qc(fastq_path_ch)
-        bowtie2samtools(metawrap_qc.out.trimmed_fastqs, btidx, params.bowtie2_samtools_threads)
+        BOWTIE2SAMTOOLS(metawrap_qc.out.trimmed_fastqs, params.bowtie2_samtools_threads)
     }
 
     if (!params.keep_metawrap_qc) {
         if (!params.skip_qc) {
-            cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
+            cleanup_trimmed_fastq_files(BOWTIE2SAMTOOLS.out.trimmed_fastqs)
         }
     }
 
-    instrain(bowtie2samtools.out.bam_file, genome_file, stb_file, params.instrain_threads)
+    instrain(BOWTIE2SAMTOOLS.out.bam_file, genome_file, stb_file, params.instrain_threads)
 
     if (!params.keep_bowtie2samtools) {
         cleanup_sorted_bam_files(instrain.out.sorted_bam)
