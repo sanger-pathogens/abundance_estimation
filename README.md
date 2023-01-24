@@ -4,9 +4,9 @@
 ```
 nextflow run abundance_estimation.nf
   --manifest                   Manifest containing paths to fastq files (mandatory)
-  --btidx                      bowtie index - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.fasta.bt2 (optional)               
-  --genome_file                genome file - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.fasta (optional)
-  --stb_file                   stb file - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.stb
+  --btidx                      bowtie index - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.bt2 (optional)               
+  --genome_file                genome file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.fasta (optional)
+  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb
   --bowtie2_samtools_threads   threads - default: 16 (optional)
   --instrain_threads           threads - default: 16 (optional)
   --instrain_full_output       get full instrain output - default false (optional)
@@ -40,6 +40,6 @@ This pipeline relies on the following modules:
 bowtie2/2.3.5--py37he860b03_0
 instrain/1.5.4
 samtools/1.9
-metawrap_custom/1.3.2-c4
-nextflow/22.04.0-5697
+metawrap_custom/1.3.2-c11
+nextflow/22.04.5-5708
 ```
