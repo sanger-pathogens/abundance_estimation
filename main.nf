@@ -9,22 +9,23 @@ include { cleanup_sorted_bam_files; cleanup_trimmed_fastq_files; cleanup_instrai
 def printHelp() {
     log.info """
     Usage:
-    nextflow run abundance_estimation.nf
+    nextflow run .
 
     Options:
       --manifest                   Manifest containing paths to fastq files (mandatory)
-      --btidx                      bowtie index - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.fasta.bt2 (optional)
-      --genome_file                genome file - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.fasta (optional)
-      --stb_file                   stb file - default: /lustre/scratch118/infgen/team162/shared/gtdb_genomes_reps_r202/gtdb_genomes_reps_r202.stb
-      --bowtie2_samtools_threads   threads - default: 16 (optional)
-      --instrain_threads           threads - default: 16 (optional)
+      --btidx                      bowtie index - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.bt2 (optional)
+      --genome_file                genome file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.fasta (optional)
+      --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
+      --bowtie2_samtools_threads   threads - default: 8 (optional)
+      --instrain_threads           threads - default: 8 (optional)
       --instrain_full_output       get full instrain output - default false (optional)
       --keep_metawrap_qc           don't cleanup metawrap_qc output - default false (optional)
       --keep_bowtie2samtools       don't cleanup bowtie2samtools output - default false (optional)
       --keep_instrain              don't cleanup instrain output - default false (optional)
       --skip_qc                    skip metawrap qc step - default false (optional)
-      --instrain_queue             job queue for instrain - default normal (optional)
-      --bowtie2samtools_queue      job queue for bowtie2samtools - default normal (optional)
+      --instrain_queue             job queue for instrain - default long (optional)
+      --instrain_quick_profile     use quick-profile option for inStrain - default false (optional)
+      --bowtie2_samtools_only      only run bowtie2_samtools process - default false (optional)
       -profile                     always use sanger_lsf when running on the farm (mandatory)
       --help                       print this help message (optional)
     """.stripIndent()
@@ -82,6 +83,11 @@ def validate_parameters() {
         errors += 1
     }
 
+    if (params.instrain_full_output && params.instrain_quick_profile) {
+        log.error("the --instrain_full_output and --instrain_quick_profile options are incompatible, please choose one of these options.")
+        errors += 1
+    }
+
     if (params.instrain_threads) {
         if (!params.instrain_threads.toString().isInteger()) {
         log.error("Please ensure the instrain_threads parameter is a number")
@@ -113,6 +119,8 @@ def validate_parameters() {
 
 
 process bowtie2samtools {
+    container '/software/pathogen/images/bowtie2-samtools-1.0.simg'
+    if (params.bowtie2_samtools_only) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.sorted.bam" }
     input:
     tuple val(sample_id), file(first_read), file(second_read)
     val btidx
@@ -121,15 +129,36 @@ process bowtie2samtools {
     output:
     tuple val(sample_id), path("${sample_id}.sorted.bam"), emit: bam_file
     tuple val(sample_id), path(first_read), path(second_read), emit: trimmed_fastqs
+    path("${sample_id}_mapping_rate.csv"), emit: map_rate_ch
 
     script:
     """
     bowtie2 -p $threads -x $btidx -1 $first_read -2 $second_read | samtools sort -@ $threads -o ${sample_id}".sorted.bam"
+    mapping_rate=\$(grep "overall alignment rate" .command.err | awk '{ print \$1 }')
+    echo ${sample_id},\${mapping_rate} > ${sample_id}_mapping_rate.csv
+    """
+}
+
+process get_overall_mapping_rate {
+    publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv'
+    input:
+    file(mapping_rate)
+
+    output:
+    path("mapping_rates.csv")
+
+    script:
+    """
+    echo "Sample,Mapping_Rate" > mapping_rates.csv
+    cat *_mapping_rate.csv >> mapping_rates.csv
     """
 }
 
 process instrain {
-    publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.tsv"
+    container '/software/pathogen/images/instrain-1.6.4-c2.simg'
+    if (params.instrain_full_output) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_output" }
+    if (params.instrain_quick_profile) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_quick_profile_output" }
+    publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
     input:
     tuple val(sample_id), file(sorted_bam)
     val genome_file
@@ -137,6 +166,8 @@ process instrain {
     val threads
 
     output:
+    path ("${sample_id}_instrain_output"), optional: true
+    path("${sample_id}_instrain_quick_profile_output"), optional: true
     path("${genome_info_file}"), optional: true
     path(sorted_bam), emit: sorted_bam
     path("${workdir}"), emit: workdir
@@ -147,13 +178,15 @@ process instrain {
     workdir="workdir.txt"
     """
     pwd > workdir.txt
-    inStrain profile $sorted_bam $genome_file -o $sample_id -p $threads -s $stb_file --database_mode --skip_plot_generation
-    if $params.instrain_full_output
+    if $params.instrain_quick_profile
     then
-        mkdir -p ${workflow.projectDir}/${params.results_dir}/${sample_id}
-        cp -r $sample_id/* ${workflow.projectDir}/${params.results_dir}/${sample_id}
+        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p $threads -s $stb_file
     else
-        mv ${sample_id}/output/${sample_id}"_genome_info.tsv" .
+        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p $threads -s $stb_file --database_mode --skip_plot_generation
+    fi
+    if ! $params.instrain_full_output && ! $params.instrain_quick_profile
+    then
+        mv ${sample_id}_instrain_output/output/${sample_id}"_instrain_output_genome_info.tsv" ./${sample_id}"_genome_info.tsv"
     fi
     """
 }
@@ -179,11 +212,17 @@ workflow {
             cleanup_trimmed_fastq_files(bowtie2samtools.out.trimmed_fastqs)
         }
     }
-    instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
-    if (!params.keep_bowtie2samtools) {
+    get_overall_mapping_rate(bowtie2samtools.out.map_rate_ch.collect())
+    if (!params.bowtie2_samtools_only) {
+        instrain(bowtie2samtools.out.bam_file, params.genome_file, params.stb_file, params.instrain_threads)
+    }
+    if (!params.keep_bowtie2samtools && params.bowtie2_samtools_only) {
+        cleanup_sorted_bam_files(bowtie2samtools.out.bam_file)
+    }
+    else if(!params.keep_bowtie2samtools) {
         cleanup_sorted_bam_files(instrain.out.sorted_bam)
     }
-    if (!params.keep_instrain) {
+    if (!params.keep_instrain && !params.bowtie2_samtools_only) {
         cleanup_instrain_output(instrain.out.workdir, instrain.out.sample_id)
     }
 }

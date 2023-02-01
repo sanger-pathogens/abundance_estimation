@@ -1,4 +1,5 @@
 process metawrap_qc {
+    container '/software/pathogen/images/metawrap_custom-1.3.2-c11.simg'
     input:
     tuple val(sample_id), file(first_read), file(second_read)
 
