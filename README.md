@@ -2,25 +2,35 @@
 
 ## Usage
 ```
-nextflow run abundance_estimation.nf
+nextflow run .
   --manifest                   Manifest containing paths to fastq files (mandatory)
   --btidx                      bowtie index - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.bt2 (optional)               
   --genome_file                genome file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.fasta (optional)
-  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb
-  --bowtie2_samtools_threads   threads - default: 16 (optional)
-  --instrain_threads           threads - default: 16 (optional)
+  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
+  --bowtie2_samtools_threads   threads - default: 8 (optional)
+  --instrain_threads           threads - default: 8 (optional)
   --instrain_full_output       get full instrain output - default false (optional)
   --keep_metawrap_qc           don't cleanup metawrap_qc output - default false (optional)
   --keep_bowtie2samtools       don't cleanup bowtie2samtools output - default false (optional)
   --keep_instrain              don't cleanup instrain output - default false (optional)
   --skip_qc                    skip metawrap qc step - default false (optional)
-  --instrain_queue             job queue for instrain - default normal (optional)
-  --bowtie2samtools_queue      job queue for bowtie2samtools - default normal (optional)
+  --instrain_queue             job queue for instrain - default long (optional)
+  --instrain_quick_profile     use quick-profile option for inStrain - default false (optional)
+  --bowtie2_samtools_only      only run bowtie2_samtools process - default false (optional)
   -profile                     always use sanger_lsf when running on the farm (mandatory)
   --help                       print this help message (optional)
 ```
 
 ## Generating manifests
+
+If your data is stored in the PaM informatics pipeline system, you can use the following method:
+
+`./generate_manifest_from_lanes.sh -l <lanes_file>`
+
+For more information, run:
+`./generate_manifest_from_lanes.sh -h`
+
+If your data is not stored in the PaM informatics pipeline system, use the following method:
 ### Step 1:
 Obtain fastq paths:
 `ls -d -1 <path>/*.fastq.gz > fastq_paths.txt`
@@ -37,9 +47,6 @@ For development, smaller test databases are available, these will significantly 
 ## Dependencies
 This pipeline relies on the following modules:
 ```
-bowtie2/2.3.5--py37he860b03_0
-instrain/1.5.4
-samtools/1.9
-metawrap_custom/1.3.2-c11
-nextflow/22.04.5-5708
+nextflow/22.10
+ISG/singularity/3.6.4
 ```
