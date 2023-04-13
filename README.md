@@ -53,5 +53,7 @@ ISG/singularity/3.6.4
 
 ## Resource requirements
 `bowtie2samtools` - 250GB ( ~2hr) submits with 250Gb and then on retry escalate to 350Gb, 8 CPUs
+
 `inStrain` - 300 GB ( ~ 12hr) submits with 300Gb then on retry escalates to 400Gb, 8 CPUs
+
 It’s not particularly uncommon for these things to run out of memory, so they do need to retry on a few samples for each run
