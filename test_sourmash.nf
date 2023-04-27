@@ -2,7 +2,7 @@
 
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
 include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
-include { SUBSET_SOURMASH_GENES; SUBSET_GTDB; CONCATENATE_FASTAS } from './modules/subset_fasta.nf'
+include { GET_GENOME_SUBSET; SUBSET_GTDB } from './modules/subset_fasta.nf'
 include { BOWTIE_INDEX } from './modules/bowtie.nf'
 
 workflow {
@@ -17,11 +17,13 @@ workflow {
 
     SOURMASH_GATHER(SOURMASH_SKETCH.out.sketch)
 
-    SUBSET_SOURMASH_GENES(SOURMASH_GATHER.out.sourmash_genomes)
+    GET_GENOME_SUBSET(SOURMASH_GATHER.out.sourmash_genomes)
 
-    SUBSET_GTDB(SUBSET_SOURMASH_GENES.out.subset_genomes.transpose())
+    SUBSET_GTDB(GET_GENOME_SUBSET.out.subset_genomes)
 
-    CONCATENATE_FASTAS(SUBSET_GTDB.out.subset_fasta.groupTuple())
+    BOWTIE_INDEX(SUBSET_GTDB.out.subset_fasta)
 
-    BOWTIE_INDEX(CONCATENATE_FASTAS.out.subset_reference)
+    //BOWTIE_INDEX.out.bowtie_index
+    //                           .join(SUBSET_GTDB.out.subset_fasta)
+    //                           .join(fastq_path_ch)
 }

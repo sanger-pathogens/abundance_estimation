@@ -5,10 +5,10 @@ process BOWTIE_INDEX {
     tuple val(sample_id), path(subset_fasta)
 
     output:
-    tuple val(sample_id), path(subset_fasta), path("*.bt2")
+    tuple val(sample_id), path(subset_fasta), path("*.bt2"), emit: bowtie_index
 
     script:
     """
-    bowtie2-build $subset_fasta ${sample_id}.fasta --threads 4
+    bowtie2-build $subset_fasta ${sample_id}.fasta --threads 16 --large-index
     """
 }

@@ -25,7 +25,7 @@ process SOURMASH_GATHER {
     sourmash_genomes="${sample_id}_sourmash_genomes.txt"
     """
     sourmash gather --dna ${sourmash_sketch} /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip -o sourmash.out
-    # this is arbritary for testing
-    head sourmash.out | tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' > ${sample_id}_sourmash_genomes.txt
+    # get species names out of sourmash output
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$2,\$3 }' > ${sample_id}_sourmash_genomes.txt
     """
 }
