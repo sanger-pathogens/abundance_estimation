@@ -1,10 +1,10 @@
-process cleanup_sorted_bam_files {
+process CLEANUP_SORTED_BAM_FILES {
     /**
     * Cleanup intermediate files
     */
 
     input:
-        file(sorted_bam_file)
+        path(sorted_bam_file)
 
     script:
         """
@@ -15,13 +15,13 @@ process cleanup_sorted_bam_files {
         """
 }
 
-process cleanup_trimmed_fastq_files {
+process CLEANUP_TRIMMED_FASTQ_FILES {
     /**
     * Cleanup intermediate files
     */
 
     input:
-        tuple val(sample_id), file(first_read), file(second_read)
+        tuple val(sample_id), path(first_read), path(second_read)
 
     script:
         """
@@ -32,7 +32,7 @@ process cleanup_trimmed_fastq_files {
         """
 }
 
-process cleanup_instrain_output {
+process CLEANUP_INSTRAIN_OUTPUT {
     /**
     * Cleanup unused output
     */
