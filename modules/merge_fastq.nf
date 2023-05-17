@@ -1,14 +1,15 @@
 process MERGE_FASTQS {
+    tag "${sample_id}"
     container '/software/pathogen/images/sourmash-4.5.0--hdfd78af_0.simg'
     input:
-    path(fastqs)
+    tuple val(sample_id), path(first_read), path(second_read)
 
     output:
-    path(merged_fastq), emit: merged_fastq
+    tuple val(sample_id), path(merged_fastq), emit: merged_fastq
 
     script:
-    merged_fastq="merged.fastq.gz"
+    merged_fastq="${sample_id}_merged.fastq.gz"
     """
-    cat *.fastq.gz > merged.fastq.gz
+    cat ${first_read} ${second_read} > ${sample_id}_merged.fastq.gz
     """
 }

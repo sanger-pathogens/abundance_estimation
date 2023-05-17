@@ -4,7 +4,7 @@ include { METAWRAP_QC } from './modules/metawrap_qc.nf'
 include { CLEANUP_SORTED_BAM_FILES; CLEANUP_TRIMMED_FASTQ_FILES; CLEANUP_INSTRAIN_OUTPUT } from './modules/cleanup.nf'
 include { VALIDATE_PARAMETERS; PRINT_HELP } from './modules/helper_functions.nf'
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
-include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
+include { SOURMASH_SKETCH; SOURMASH_GATHER; SORT_SOURMASH_GENOMES } from './modules/sourmash.nf'
 include { SUBSET_GTDB } from './modules/subset_fasta.nf'
 include { BOWTIE_INDEX; BOWTIE2SAMTOOLS; GET_OVERALL_MAPPING_RATE } from './modules/bowtie.nf'
 include { GENERATE_STB; INSTRAIN } from './modules/instrain.nf'
@@ -22,19 +22,19 @@ workflow {
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
             .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
 
-    fastq_ch = fastq_path_ch.map{ sample_id, first_read, second_read -> tuple(file(first_read), file(second_read)) }
-
-    MERGE_FASTQS(fastq_ch.collect())
+    MERGE_FASTQS(fastq_path_ch)
 
     SOURMASH_SKETCH(MERGE_FASTQS.out.merged_fastq)
 
     SOURMASH_GATHER(SOURMASH_SKETCH.out.sketch)
 
-    SUBSET_GTDB(SOURMASH_GATHER.out.sourmash_genomes)
+    SORT_SOURMASH_GENOMES(SOURMASH_GATHER.out.sourmash_genomes.collect())
+
+    SUBSET_GTDB(SORT_SOURMASH_GENOMES.out.sorted_genomes)
 
     BOWTIE_INDEX(SUBSET_GTDB.out.subset_genome)
 
-    GENERATE_STB(SUBSET_GTDB.out.subset_genome)
+    GENERATE_STB(SORT_SOURMASH_GENOMES.out.sorted_genomes)
 
     if (params.skip_qc) {
         BOWTIE2SAMTOOLS(fastq_path_ch, BOWTIE_INDEX.out.bowtie_index, params.bowtie2_samtools_threads)
