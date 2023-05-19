@@ -34,7 +34,7 @@ workflow {
 
     BOWTIE_INDEX(SUBSET_GTDB.out.subset_genome)
 
-    GENERATE_STB(SUBSET_GTDB.out.subset_genome)
+    GENERATE_STB(SOURMASH_GATHER.out.sourmash_genomes)
 
     if (params.skip_qc) {
         BOWTIE2SAMTOOLS(fastq_path_ch, BOWTIE_INDEX.out.bowtie_index, params.bowtie2_samtools_threads)

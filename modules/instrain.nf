@@ -37,16 +37,15 @@ process INSTRAIN {
 }
 
 process GENERATE_STB {
-    container '/software/pathogen/images/drep-3.2.2-c2.simg'
-
     input:
-    path(gtdb_subset_reference)
+    path(sourmash_genomes)
 
     output:
     path("*.stb"), emit: stb_ch
 
     script:
     """
-    parse_stb.py --reverse -f ${gtdb_subset_reference} -o gtdb_subset_reference.stb
+    sed 's|\$|_genomic.fna.gz|g' $sourmash_genomes > genomes.txt
+    grep -w -f genomes.txt ${params.stb_file} > gtdb_subset.stb
     """
 }

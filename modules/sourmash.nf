@@ -26,6 +26,6 @@ process SOURMASH_GATHER {
     """
     sourmash gather --dna ${sourmash_sketch} /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip -o sourmash.out
     # get species names out of sourmash output
-    tail -n +2 sourmash.out | awk -F "," '\$3>0.05' | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > sourmash_genomes.txt
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > sourmash_genomes.txt
     """
 }
