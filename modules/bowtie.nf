@@ -1,4 +1,5 @@
 process BOWTIE_INDEX {
+    maxForks 3
     tag "${sourmash_genome}"
     container '/software/pathogen/images/bowtie2-2.3.5--py37he860b03_0.simg'
     publishDir "${params.index_cache}/${sourmash_genome}", mode: 'copy', overwrite: true, pattern: '*bt2*'
@@ -11,7 +12,7 @@ process BOWTIE_INDEX {
 
     script:
     """
-    bowtie2-build $assembly ${sourmash_genome}.bt2 --threads 4
+    bowtie2-build $assembly ${sourmash_genome}.bt2 --large-index --threads 4
     """
 }
 
@@ -34,15 +35,18 @@ process BOWTIE2SAMTOOLS {
     tag "${sample_id}"
     container '/software/pathogen/images/bowtie2-samtools-1.0.simg'
     input:
-    tuple val(sample_id), path(read_1), path(read_2), val(assembly_id)
+    tuple val(sample_id), val(assembly_id)
     path(indexes)
+    path(manifest)
 
     output:
-    tuple val(sample_id), path("${sample_id}_${assembly_id}.sorted.bam"), emit: bam_file
+    tuple val(sample_id), val(assembly_id), path("${sample_id}_${assembly_id}.sorted.bam"), emit: bam_file
 
     script:
     """
-    bowtie2 -p ${params.bowtie2_samtools_threads} -x ${params.index_cache}/${assembly_id}/${assembly_id}.bt2 -1 $read_1 -2 $read_2 | samtools sort -@ ${params.bowtie2_samtools_threads} -o ${sample_id}_${assembly_id}".sorted.bam"
+    first_read=\$(grep -w ${sample_id} ${manifest} | awk -F "," '{ print \$2 }')
+    second_read=\$(grep -w ${sample_id} ${manifest} | awk -F "," '{ print \$3 }')
+    bowtie2 -p ${params.bowtie2_samtools_threads} -x ${params.index_cache}/${assembly_id}/${assembly_id}.bt2 -1 \$first_read -2 \$second_read | samtools sort -@ ${params.bowtie2_samtools_threads} -o ${sample_id}_${assembly_id}".sorted.bam"
     """
 }
 

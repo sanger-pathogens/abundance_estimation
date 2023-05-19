@@ -14,6 +14,24 @@ process SUBSET_ASSEMBLY_FILE {
     """
 }
 
+process COLLECT_ASSEMBLIES {
+    tag "${sourmash_genus}"
+    input:
+    val(sourmash_genus)
+
+    output:
+    tuple val(sourmash_genus), path("*.fa"), emit: assembly
+
+    script:
+    """
+    genomes=\$(grep g__${sourmash_genus} ${params.sourmash_taxonomy_file} | awk -F "," '{ print \$1 }')
+    for genome in \${genomes}
+    do
+      zcat ${params.genome_dir}/\${genome}_genomic.fna.gz >> ${sourmash_genus}_gtdb_ref.fa
+    done
+    """
+}
+
 process GUNZIP_ASSEMBLY {
     tag "${sourmash_genome}"
     input:

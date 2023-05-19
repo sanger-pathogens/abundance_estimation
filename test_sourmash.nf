@@ -2,7 +2,7 @@
 
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
 include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
-include { SUBSET_ASSEMBLY_FILE; GUNZIP_ASSEMBLY } from './modules/subset_fasta.nf'
+include { SUBSET_ASSEMBLY_FILE; GUNZIP_ASSEMBLY; COLLECT_ASSEMBLIES } from './modules/subset_fasta.nf'
 include { BOWTIE_INDEX; BOWTIE2SAMTOOLS } from './modules/bowtie.nf'
 include { INSTRAIN; GENERATE_STB; COLLATE_INSTRAIN_RESULTS } from './modules/instrain.nf'
 
@@ -32,20 +32,20 @@ workflow {
 
     bowtie_index_ch = Channel.empty()
 
-    GUNZIP_ASSEMBLY(indexing_ch)
+    COLLECT_ASSEMBLIES(indexing_ch)
 
-    BOWTIE_INDEX(GUNZIP_ASSEMBLY.out.assembly)
+    BOWTIE_INDEX(COLLECT_ASSEMBLIES.out.assembly)
 
     //bowtie_index_ch = bowtie_index_ch.mix(BOWTIE_INDEX.out.bowtie_index.last())
 
     // if no indexes are computed, add a file into the channel to avoid dependency issues and proceed straight to mapping
     bowtie_index_ch = BOWTIE_INDEX.out.bowtie_index.ifEmpty(file(params.index_cache))
 
-    bowtie_index_ch.last().view()
+    //mapping_ch = MERGE_FASTQS.out.fastq_ch.join(sourmash_assembly_channel).transpose()
 
-    mapping_ch = fastq_path_ch.join(sourmash_assembly_channel).transpose()
+    mapping_ch = sourmash_assembly_channel.transpose()
 
-    BOWTIE2SAMTOOLS(mapping_ch, bowtie_index_ch.last())
+    BOWTIE2SAMTOOLS(mapping_ch, bowtie_index_ch.last(), file(params.manifest))
 
     GENERATE_STB(BOWTIE2SAMTOOLS.out.bam_file)
 
@@ -54,7 +54,7 @@ workflow {
     instrain_genome_info_ch = INSTRAIN.out.genome_info_ch.groupTuple()
 
     COLLATE_INSTRAIN_RESULTS(instrain_genome_info_ch, file(params.instrain_header_file))
-
+//
     //SAMTOOLS_MERGE(BOWTIE2SAMTOOLS.out.bam_file.groupTuple())
 
     //MERGE_FASTAS(BOWTIE2SAMTOOLS.out.bam_file.groupTuple())

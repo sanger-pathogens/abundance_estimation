@@ -3,7 +3,7 @@ process INSTRAIN {
     container '/software/pathogen/images/instrain-1.6.4-c2.simg'
 
     input:
-    tuple val(sample_id), path(sorted_bam), path(stb_file), path(genome_file)
+    tuple val(sample_id), val(assembly_id), path(sorted_bam), path(stb_file), path(genome_file)
 
     output:
     tuple val(sample_id), path("*_genome_info.tsv"), emit: genome_info_ch
@@ -22,16 +22,21 @@ process GENERATE_STB {
     container '/software/pathogen/images/drep-3.2.2-c2.simg'
 
     input:
-    tuple val(sample_id), path(sorted_bam)
+    tuple val(sample_id), val(assembly_id), path(sorted_bam)
 
     output:
-    tuple val(sample_id), path(sorted_bam), path("*.stb"), path("*.fa"), emit: instrain_ch
+    tuple val(sample_id), val(assembly_id), path(sorted_bam), path("*.stb"), path("*.fa"), emit: instrain_ch
 
     script:
     """
-    assembly=\$(ls *.bam | sed 's/^.*GCF/GCF/' | sed 's/^.*GCA/GCA/' | sed 's/.sorted.bam//g')
-    gunzip -c /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir/\${assembly}_genomic.fna.gz > \${assembly}.fa
-    parse_stb.py --reverse -f \${assembly}.fa -o \${assembly}_representative.stb
+    genomes=\$(grep g__${assembly_id} ${params.sourmash_taxonomy_file} | awk -F "," '{ print \$1 }')
+    for genome in \${genomes}
+    do
+      zcat ${params.genome_dir}/\${genome}_genomic.fna.gz >> ${assembly_id}_gtdb_ref.fa
+      echo \${genome} >> ${sample_id}_genomes.txt
+    done
+    sed -i 's|\$|_genomic.fna.gz|g' ${sample_id}_genomes.txt
+    grep -w -f ${sample_id}_genomes.txt ${params.stb_file} > ${sample_id}_gtdb_subset.stb
     """
 }
 
