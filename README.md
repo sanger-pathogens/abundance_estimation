@@ -4,20 +4,18 @@
 ```
 nextflow run .
   --manifest                   Manifest containing paths to fastq files (mandatory)
-  --btidx                      bowtie index - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.bt2 (optional)               
-  --genome_file                genome file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.fasta (optional)
-  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
-  --bowtie2_samtools_threads   threads - default: 8 (optional)
-  --instrain_threads           threads - default: 8 (optional)
+  --bowtie2_samtools_threads   threads - default: 4 (optional)
+  --instrain_threads           threads - default: 4 (optional)
   --instrain_full_output       get full instrain output - default false (optional)
-  --keep_metawrap_qc           don't cleanup metawrap_qc output - default false (optional)
-  --keep_bowtie2samtools       don't cleanup bowtie2samtools output - default false (optional)
-  --keep_instrain              don't cleanup instrain output - default false (optional)
+  --cleanup_intermediate_files cleanup intermediate files - default false (optional)
   --skip_qc                    skip metawrap qc step - default false (optional)
-  --instrain_queue             job queue for instrain - default long (optional)
+  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
+  --genome_dir                 genome folder - default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir (optional)
+  --results_dir                results folder - default: ./nextflow_results
+  --sourmash_db                sourmash database - default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip (optional)
+  --instrain_queue             job queue for instrain - default normal (optional)
   --instrain_quick_profile     use quick-profile option for inStrain - default false (optional)
   --bowtie2_samtools_only      only run bowtie2_samtools process - default false (optional)
-  -profile                     always use sanger_lsf when running on the farm (mandatory)
   --help                       print this help message (optional)
 ```
 
