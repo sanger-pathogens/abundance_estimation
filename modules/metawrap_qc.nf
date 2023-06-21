@@ -1,7 +1,7 @@
-process metawrap_qc {
+process METAWRAP_QC {
     container '/software/pathogen/images/metawrap_custom-1.3.2-c11.simg'
     input:
-    tuple val(sample_id), file(first_read), file(second_read)
+    tuple val(sample_id), path(first_read), path(second_read)
 
     output:
     tuple val(sample_id), path("${read_1}"), path("${read_2}"), emit: trimmed_fastqs
