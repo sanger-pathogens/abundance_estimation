@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-include { METAWRAP_QC } from './modules/metawrap_qc.nf'
+include { METAWRAP_QC } from './subworkflows/metawrap_qc.nf'
 include { CLEANUP_SORTED_BAM_FILES; CLEANUP_TRIMMED_FASTQ_FILES; CLEANUP_INSTRAIN_OUTPUT } from './modules/cleanup.nf'
 include { VALIDATE_PARAMETERS; PRINT_HELP } from './modules/helper_functions.nf'
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
@@ -27,7 +27,7 @@ workflow {
     } else {
         METAWRAP_QC(fastq_path_ch)
 
-        MERGE_FASTQS(METAWRAP_QC.out.trimmed_fastqs)
+        MERGE_FASTQS(METAWRAP_QC.out.filtered_reads)
     }
 
     SOURMASH_SKETCH(MERGE_FASTQS.out.merged_fastq)
@@ -45,7 +45,7 @@ workflow {
         BOWTIE2SAMTOOLS(bowtie_mapping_ch, params.bowtie2_samtools_threads)
     }
     else {
-        bowtie_mapping_ch = METAWRAP_QC.out.trimmed_fastqs.join(BOWTIE_INDEX.out.bowtie_index)
+        bowtie_mapping_ch = METAWRAP_QC.out.filtered_reads.join(BOWTIE_INDEX.out.bowtie_index)
         BOWTIE2SAMTOOLS(bowtie_mapping_ch, params.bowtie2_samtools_threads)
     }
 
