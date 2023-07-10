@@ -1,5 +1,5 @@
 process BOWTIE_INDEX {
-    container '/software/pathogen/images/bowtie2-2.3.5--py37he860b03_0.simg'
+    container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
     input:
     tuple val(sample_id), path(subset_fasta)
 
@@ -14,7 +14,7 @@ process BOWTIE_INDEX {
 
 process BOWTIE2SAMTOOLS {
     tag "${sample_id}"
-    container '/software/pathogen/images/bowtie2-samtools-1.0.simg'
+    container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
     if (params.bowtie2_samtools_only) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.sorted.bam" }
     input:
     tuple val(sample_id), path(first_read), path(second_read), path(btidx)
