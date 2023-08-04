@@ -1,4 +1,8 @@
 process SUBSET_GTDB {
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     input:
     tuple val(sample_id), path(sourmash_genomes)
 

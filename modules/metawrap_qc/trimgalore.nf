@@ -1,5 +1,9 @@
 process TRIMGALORE {
-    tag "$sample_id"
+    tag "${sample_id}"
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/trimgalore-v0.4.4.simg'
 
     input:

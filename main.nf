@@ -1,22 +1,75 @@
 #!/usr/bin/env nextflow
 
-include { METAWRAP_QC } from './subworkflows/metawrap_qc.nf'
+/*
+========================================================================================
+    HELP
+========================================================================================
+*/
+
+def printHelp() {
+    log.info """
+    Usage:
+    nextflow run main.nf
+
+    Options:
+      --manifest                      Manifest containing paths to fastq files. (mandatory)
+      --results_dir                   Name of results folder. [default: nextflow_results] (optional)
+      --bowtie2_samtools_threads      Threads for bowtie2 and samtools. [default: 4] (optional)
+      --instrain_threads              Threads for instrain. [default: 4] (optional)
+      --instrain_full_output          Get full instrain output. [default: false] (optional)
+      --cleanup_intermediate_files    Cleanup intermediate files. [default: false] (optional)
+      --skip_qc                       Skip metawrap qc step. [default: false] (optional)
+      --stb_file                      Supply stb file. [default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb] (optional)
+      --genome_dir                    Supply genome folder. [default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir] (optional)
+      --sourmash_db                   Supply sourmash database. [default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip] (optional)
+      --instrain_quick_profile        Use quick-profile option for inStrain. [default: false] (optional)
+      --bowtie2_samtools_only         Only run bowtie2_samtools process. [default: false] (optional)
+      --help                          Print this help message. (optional)
+    """.stripIndent()
+}
+
+if (params.help) {
+    printHelp()
+    exit 0
+}
+
+/*
+========================================================================================
+    IMPORT MODULES/SUBWORKFLOWS
+========================================================================================
+*/
+
+//
+// MODULES
+//
+include { validate_parameters } from './modules/helper_functions.nf'
 include { CLEANUP_SORTED_BAM_FILES; CLEANUP_TRIMMED_FASTQ_FILES; CLEANUP_INSTRAIN_OUTPUT } from './modules/cleanup.nf'
-include { VALIDATE_PARAMETERS; PRINT_HELP } from './modules/helper_functions.nf'
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
 include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
 include { SUBSET_GTDB } from './modules/subset_fasta.nf'
 include { BOWTIE_INDEX; BOWTIE2SAMTOOLS; GET_OVERALL_MAPPING_RATE } from './modules/bowtie.nf'
 include { GENERATE_STB; INSTRAIN } from './modules/instrain.nf'
 
+//
+// SUBWORKFLOWS
+//
+include { METAWRAP_QC } from './subworkflows/metawrap_qc.nf'
+
+/*
+========================================================================================
+    VALIDATE INPUTS
+========================================================================================
+*/
+
+validate_parameters()
+
+/*
+========================================================================================
+    RUN MAIN WORKFLOW
+========================================================================================
+*/
+
 workflow {
-    if (params.help) {
-        PRINT_HELP()
-        exit 0
-    }
-
-    VALIDATE_PARAMETERS()
-
     manifest_ch = Channel.fromPath(params.manifest)
 
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
@@ -59,7 +112,7 @@ workflow {
 
     if (!params.bowtie2_samtools_only) {
         instrain_profiling_ch = BOWTIE2SAMTOOLS.out.bam_file.join(GENERATE_STB.out.stb_ch).join(SUBSET_GTDB.out.subset_genome)
-        INSTRAIN(instrain_profiling_ch, params.instrain_threads)
+        INSTRAIN(instrain_profiling_ch)
     }
 
     if (params.cleanup_intermediate_files && params.bowtie2_samtools_only) {

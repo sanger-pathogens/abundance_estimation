@@ -1,5 +1,10 @@
 process BOWTIE_INDEX {
+    label 'cpu_4'
+    label 'mem_32'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
+
     input:
     tuple val(sample_id), path(subset_fasta)
 
@@ -14,7 +19,10 @@ process BOWTIE_INDEX {
 
 process BOWTIE2SAMTOOLS {
     tag "${sample_id}"
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
+
     if (params.bowtie2_samtools_only) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.sorted.bam" }
     input:
     tuple val(sample_id), path(first_read), path(second_read), path(btidx)
@@ -35,6 +43,7 @@ process BOWTIE2SAMTOOLS {
 
 process GET_OVERALL_MAPPING_RATE {
     publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv'
+    
     input:
     path(mapping_rate)
 

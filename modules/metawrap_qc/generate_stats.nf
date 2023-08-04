@@ -1,5 +1,9 @@
 process GENERATE_STATS {
-    tag "$sample_id"
+    tag "${sample_id}"
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/metawrap_qc_python-1.0.simg'
 
     input:

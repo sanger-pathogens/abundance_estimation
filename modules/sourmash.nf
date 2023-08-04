@@ -1,6 +1,11 @@
 process SOURMASH_SKETCH {
     tag "${sample_id}"
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/sourmash-4.5.0--hdfd78af_0.simg'
+
     input:
     tuple val(sample_id), path(merged_fastq)
 
@@ -16,7 +21,12 @@ process SOURMASH_SKETCH {
 
 process SOURMASH_GATHER {
     tag "${sample_id}"
+    label 'cpu_1'
+    label 'mem_4'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/sourmash-4.5.0--hdfd78af_0.simg'
+
     input:
     tuple val(sample_id), path(sourmash_sketch)
 
