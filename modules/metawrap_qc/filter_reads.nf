@@ -1,7 +1,12 @@
 process FILTER_HOST_READS {
-    publishDir "${params.results_dir}/metawrap_qc/cleaned_reads", mode: 'copy', overwrite: true, pattern: "*_clean*.fastq.gz"
-    tag "$sample_id"
+    tag "${sample_id}"
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/metawrap_qc_python-1.0.simg'
+
+    publishDir "${params.results_dir}/metawrap_qc/cleaned_reads", mode: 'copy', overwrite: true, pattern: "*_clean*.fastq.gz"
 
     input:
     tuple val(sample_id), path(first_read), path(second_read)

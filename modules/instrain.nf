@@ -1,12 +1,15 @@
 process INSTRAIN {
     tag "${sample_id}"
+    label 'time_queue_from_normal'
+
     container '/software/pathogen/images/instrain-1.6.4-c2.simg'
+
     if (params.instrain_full_output) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_output" }
     if (params.instrain_quick_profile) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_quick_profile_output" }
     publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
+    
     input:
     tuple val(sample_id), path(sorted_bam), path(stb_file), path(genome_file)
-    val threads
 
     output:
     path ("${sample_id}_instrain_output"), optional: true
@@ -23,9 +26,9 @@ process INSTRAIN {
     pwd > workdir.txt
     if $params.instrain_quick_profile
     then
-        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p $threads -s $stb_file
+        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p ${task.cpus} -s $stb_file
     else
-        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p $threads -s $stb_file --database_mode --skip_plot_generation
+        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p ${task.cpus} -s $stb_file --database_mode --skip_plot_generation
     fi
     if ! $params.instrain_full_output && ! $params.instrain_quick_profile
     then
@@ -35,6 +38,10 @@ process INSTRAIN {
 }
 
 process GENERATE_STB {
+    label 'cpu_1'
+    label 'mem_1'
+    label 'time_queue_from_normal'
+
     input:
     tuple val(sample_id), path(sourmash_genomes)
 
