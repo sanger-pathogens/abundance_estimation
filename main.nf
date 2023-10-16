@@ -180,9 +180,9 @@ process instrain {
     pwd > workdir.txt
     if $params.instrain_quick_profile
     then
-        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p $threads -s $stb_file
+        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p $threads -s $stb_file ${params.other_instrain_params}
     else
-        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p $threads -s $stb_file --database_mode --skip_plot_generation
+        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p $threads -s $stb_file --skip_mm_profiling --skip_plot_generation ${params.other_instrain_params}
     fi
     if ! $params.instrain_full_output && ! $params.instrain_quick_profile
     then
