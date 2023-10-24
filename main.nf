@@ -19,7 +19,7 @@ def printHelp() {
       --instrain_full_output          Get full instrain output. [default: false] (optional)
       --cleanup_intermediate_files    Cleanup intermediate files. [default: false] (optional)
       --skip_qc                       Skip metawrap qc step. [default: false] (optional)
-      --stb_file                      Supply stb file. [default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb] (optional)
+      --stb_file                      Supply stb file. [default: /lustre/scratch125/pam/data/software/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb] (optional)
       --genome_dir                    Supply genome folder. [default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir] (optional)
       --sourmash_db                   Supply sourmash database. [default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip] (optional)
       --instrain_quick_profile        Use quick-profile option for inStrain. [default: false] (optional)
