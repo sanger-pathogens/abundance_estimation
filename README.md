@@ -9,7 +9,7 @@ nextflow run .
   --instrain_full_output       get full instrain output - default false (optional)
   --cleanup_intermediate_files cleanup intermediate files - default false (optional)
   --skip_qc                    skip metawrap qc step - default false (optional)
-  --stb_file                   stb file - default: /lustre/scratch125/pam/pathogen/pathpipe/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
+  --stb_file                   stb file - default: /lustre/scratch125/pam/data/software/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
   --genome_dir                 genome folder - default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir (optional)
   --results_dir                results folder - default: ./nextflow_results
   --sourmash_db                sourmash database - default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip (optional)
