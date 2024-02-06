@@ -3,7 +3,7 @@
 ## Usage
 ```
 nextflow run .
-  --manifest                   Manifest containing paths to fastq files (mandatory)
+  --manifest                   Manifest containing paths to fastq files with headers ID,R1,R2 (mandatory)
   --bowtie2_samtools_threads   threads - default: 4 (optional)
   --instrain_threads           threads - default: 4 (optional)
   --instrain_full_output       get full instrain output - default false (optional)
