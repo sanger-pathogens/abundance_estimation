@@ -12,7 +12,7 @@ def printHelp() {
     nextflow run main.nf
 
     Options:
-      --manifest                      Manifest containing paths to fastq files. (mandatory)
+      --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2 (mandatory)
       --results_dir                   Name of results folder. [default: nextflow_results] (optional)
       --bowtie2_samtools_threads      Threads for bowtie2 and samtools. [default: 4] (optional)
       --instrain_threads              Threads for instrain. [default: 4] (optional)
@@ -73,7 +73,7 @@ workflow {
     manifest_ch = Channel.fromPath(params.manifest)
 
     fastq_path_ch = manifest_ch.splitCsv(header: true, sep: ',')
-            .map{ row -> tuple(row.sample_id, file(row.first_read), file(row.second_read)) }
+            .map{ row -> tuple(row.ID, file(row.R1), file(row.R2)) }
 
     if (params.skip_qc) {
         MERGE_FASTQS(fastq_path_ch)
