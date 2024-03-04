@@ -43,10 +43,10 @@ def validate_number_param(param_option, param) {
     return 0
 }
 
-def validate_results_dir(results_dir) {
-    results_dir = file(results_dir)
-    if (results_dir.exists() && !results_dir.isDirectory()) {
-        log.error("The given results_dir '${results_dir}' is not a directory.")
+def validate_outdir(outdir) {
+    outdir = file(outdir)
+    if (outdir.exists() && !outdir.isDirectory()) {
+        log.error("The given outdir '${outdir}' is not a directory.")
         return 1
     }
     return 0
@@ -62,7 +62,7 @@ def validate_parameters() {
     errors += validate_number_param("--bowtie2_samtools_threads", params.bowtie2_samtools_threads)
     errors += validate_number_param("--queue_size", params.queue_size)
     errors += validate_number_param("--instrain_threads", params.instrain_threads)
-    errors += validate_results_dir(params.results_dir)
+    errors += validate_outdir(params.outdir)
 
     if (params.instrain_full_output && params.instrain_quick_profile) {
         log.error("the --instrain_full_output and --instrain_quick_profile options are incompatible, please choose one of these options.")

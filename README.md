@@ -2,21 +2,20 @@
 
 ## Usage
 ```
-nextflow run .
-  --manifest                   Manifest containing paths to fastq files with headers ID,R1,R2 (mandatory)
-  --bowtie2_samtools_threads   threads - default: 4 (optional)
-  --instrain_threads           threads - default: 4 (optional)
-  --instrain_full_output       get full instrain output - default false (optional)
-  --cleanup_intermediate_files cleanup intermediate files - default false (optional)
-  --skip_qc                    skip metawrap qc step - default false (optional)
-  --stb_file                   stb file - default: /lustre/scratch125/pam/data/software/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb (optional)
-  --genome_dir                 genome folder - default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir (optional)
-  --results_dir                results folder - default: ./nextflow_results
-  --sourmash_db                sourmash database - default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip (optional)
-  --instrain_queue             job queue for instrain - default normal (optional)
-  --instrain_quick_profile     use quick-profile option for inStrain - default false (optional)
-  --bowtie2_samtools_only      only run bowtie2_samtools process - default false (optional)
-  --help                       print this help message (optional)
+nextflow run main.nf
+      --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2. (mandatory)
+      --outdir                        Name of results folder. [default: ./results] (optional)
+      --bowtie2_samtools_threads      Threads for bowtie2 and samtools. [default: 4] (optional)
+      --instrain_threads              Threads for instrain. [default: 4] (optional)
+      --instrain_full_output          Get full instrain output. [default: false] (optional)
+      --cleanup_intermediate_files    Cleanup intermediate files. [default: false] (optional)
+      --skip_qc                       Skip metawrap qc step. [default: false] (optional)
+      --stb_file                      Supply stb file. [default: /lustre/scratch125/pam/data/software/gtdb/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207.stb] (optional)
+      --genome_dir                    Supply genome folder. [default: /data/pam/team162/shared/gtdb_genomes_reps_r207/gtdb_genomes_reps_r207_genome_dir] (optional)
+      --sourmash_db                   Supply sourmash database. [default: /data/pam/team162/shared/sourmash_db/gtdb-rs207.genomic-reps.dna.k31.zip] (optional)
+      --instrain_quick_profile        Use quick-profile option for inStrain. [default: false] (optional)
+      --bowtie2_samtools_only         Only run bowtie2_samtools process. [default: false] (optional)
+      --help                          Print this help message. (optional)
 ```
 
 ## Generating manifests
