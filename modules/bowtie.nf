@@ -3,7 +3,7 @@ process BOWTIE_INDEX {
     label 'mem_32'
     label 'time_queue_from_normal'
 
-    container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
+    container 'quay.io/sangerpathogens/bowtie2-samtools:1.1-c1'
 
     input:
     tuple val(sample_id), path(subset_fasta)
@@ -21,9 +21,9 @@ process BOWTIE2SAMTOOLS {
     tag "${sample_id}"
     label 'time_queue_from_normal'
 
-    container '/software/pathogen/images/bowtie2-samtools-1.1-c1.simg'
+    container 'quay.io/sangerpathogens/bowtie2-samtools:1.1-c1'
 
-    if (params.bowtie2_samtools_only) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*.sorted.bam" }
+    if (params.bowtie2_samtools_only) { publishDir path: "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*.sorted.bam" }
     input:
     tuple val(sample_id), path(first_read), path(second_read), path(btidx)
     val threads
@@ -42,7 +42,7 @@ process BOWTIE2SAMTOOLS {
 }
 
 process GET_OVERALL_MAPPING_RATE {
-    publishDir "${params.results_dir}/mapping_rates/", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv', saveAs: { filename -> "${workflow.start}_mapping_rates.csv" }
+    publishDir "${params.outdir}/mapping_rates/", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv', saveAs: { filename -> "${workflow.start}_mapping_rates.csv" }
     
     input:
     path(mapping_rate)

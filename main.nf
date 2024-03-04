@@ -12,8 +12,8 @@ def printHelp() {
     nextflow run main.nf
 
     Options:
-      --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2 (mandatory)
-      --results_dir                   Name of results folder. [default: nextflow_results] (optional)
+      --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2. (mandatory)
+      --outdir                        Name of results folder. [default: ./results] (optional)
       --bowtie2_samtools_threads      Threads for bowtie2 and samtools. [default: 4] (optional)
       --instrain_threads              Threads for instrain. [default: 4] (optional)
       --instrain_full_output          Get full instrain output. [default: false] (optional)

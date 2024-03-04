@@ -2,11 +2,11 @@ process INSTRAIN {
     tag "${sample_id}"
     label 'time_queue_from_normal'
 
-    container '/software/pathogen/images/instrain-1.6.4-c2.simg'
+    container 'quay.io/sangerpathogens/instrain:1.7.0'
 
-    if (params.instrain_full_output) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_output" }
-    if (params.instrain_quick_profile) { publishDir path: "${params.results_dir}", mode: 'copy', overwrite: true, pattern: "*_instrain_quick_profile_output" }
-    publishDir "${params.results_dir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
+    if (params.instrain_full_output) { publishDir path: "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*_instrain_output" }
+    if (params.instrain_quick_profile) { publishDir path: "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*_instrain_quick_profile_output" }
+    publishDir "${params.outdir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
     
     input:
     tuple val(sample_id), path(sorted_bam), path(stb_file), path(genome_file)
