@@ -54,3 +54,74 @@ ISG/singularity/3.6.4
 `inStrain` - 300 GB ( ~ 12hr) submits with 300Gb then on retry escalates to 400Gb, 8 CPUs
 
 It’s not particularly uncommon for these things to run out of memory, so they do need to retry on a few samples for each run
+
+## Custom sourmash database generation
+
+To begin you need to have a set of input genomic sequences:
+
+```
+GCA_900538355.1.fasta
+GCA_900549805.1.fasta
+GCA_900550455.1.fasta
+```
+
+In this example the extention is `.fasta`
+
+To generate a sourmash database from these files, you first need to produce a sketch for each input fasta:
+
+```
+sourmash sketch dna -p scaled=1000,k=31 db/*.fasta 
+```
+
+This will produce a collection of signature files ending in `.sig`:
+
+```
+GCA_900538355.1.fasta.sig
+GCA_900549805.1.fasta.sig
+GCA_900550455.1.fasta.sig
+```
+
+This pipeline requires that the name of the signal within the signal file is the same as the basename of the file i.e.
+
+```
+GCA_900538355.1
+```
+
+This can be produced using the command `sourmash signature rename` included in the sourmash package.
+
+To rename a collection of signature file you can use the following commands. First list the files into a list to use to rename:
+
+```
+ls *.sig > filelist
+```
+
+Then run a loop over this list using the sourmash script to rename the signature to the filename:
+
+```
+cat filelist | while read line; 
+do 
+    NAME=$(basename "$line" .fasta.sig) 
+    echo $NAME 
+    sourmash signature rename $NAME.fasta.sig "$NAME" -o $NAME.sig 
+done
+```
+
+Once complete, index the output signature files into an indexed record:
+
+```
+sourmash index -k 31 all-genomes *.sig
+```
+
+Supply the index as an argument to the pipeline option `--sourmash_db`.
+
+In this scenario you will also need to include the following option (specifying the file extension of the input sequences that were used to build the sourmash index):
+
+```
+--genomes_file_ext .fasta
+```
+
+And point to the genome dir where the .fasta files are stored:
+
+```
+--genome_dir <path_to_fasta_files>
+```
