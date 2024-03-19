@@ -50,7 +50,7 @@ process GENERATE_STB {
 
     script:
     """
-    sed 's|\$|_genomic.fna.gz|g' $sourmash_genomes > genomes.txt
-    grep -w -f genomes.txt ${params.stb_file} > ${sample_id}_gtdb_subset.stb
+    sed 's|\$|${params.genomes_file_ext}|g' $sourmash_genomes > genomes.txt
+    grep -w -f genomes.txt ${params.stb_file} > ${sample_id}_subset.stb
     """
 }
