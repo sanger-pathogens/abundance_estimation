@@ -2,7 +2,7 @@ process INSTRAIN {
     tag "${sample_id}"
     label 'time_queue_from_normal'
 
-    container 'quay.io/sangerpathogens/instrain:1.7.0'
+    container 'quay.io/biocontainers/instrain:1.9.0--pyhdfd78af_0'
 
     if (params.instrain_full_output) { publishDir path: "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*_instrain_output" }
     if (params.instrain_quick_profile) { publishDir path: "${params.outdir}", mode: 'copy', overwrite: true, pattern: "*_instrain_quick_profile_output" }
