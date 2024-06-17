@@ -10,9 +10,6 @@ process SUBSET_GENOMES {
     tuple val(sample_id), path("subset_ref_database.fasta"), emit: subset_genome
     script:
     """
-    while read genome
-    do
-      zcat -f ${params.genome_dir}/\${genome}${params.genomes_file_ext} >> subset_ref_database.fasta
-    done < ${sourmash_genomes}
+    ${projectDir}/bin/subset_fasta.sh ${sourmash_genomes} ${params.genome_dir} ${params.genomes_file_ext}
     """
 }
