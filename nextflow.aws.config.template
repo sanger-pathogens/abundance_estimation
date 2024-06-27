@@ -1,0 +1,94 @@
+// Config inheritance options
+params {
+    generic_config_base = "https://raw.githubusercontent.com/sanger-pathogens/nextflow-commons"
+    generic_config_version = "master"
+    generic_config_url = ""
+}
+inherit_generic_config()
+
+manifest {
+    name            = 'abundance_estimation'
+    author          = 'PAM Informatics'
+    homePage        = 'https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/team162/abundance_estimation'
+    description     = 'Abundance estimation pipeline for metagenomic reads'
+    mainScript      = 'main.nf'
+    nextflowVersion = '>=21.04.0'
+    version         = 'v0.2.2'
+}
+
+params {
+    // AWS params, leave blank if running locally
+    aws_cli = "/home/ec2-user/miniconda/bin/aws" // Should be same as aws.batch.cliPath
+
+    // Input options
+    manifest = ""
+    outdir = "s3://nextflowbucket4711/output/abundance_estimation/"
+    stb_file = "s3://nextflowbucket4711/static/abundance_estimation/gtdb_genomes_reps_r207.stb"
+    genome_dir = "s3://nextflowbucket4711/static/abundance_estimation/gtdb_genomes_reps_r207_genome_dir" // IMPORTANT no trailing slash
+    sourmash_db = "/efs/abundance_estimation/gtdb-rs207.genomic-reps.dna.k31.zip"
+    genomes_file_ext = "_genomic.fna.gz"
+    bowtie2_samtools_threads = 4
+    instrain_threads = 4
+    instrain_full_output = false
+    instrain_quick_profile = false
+    skip_qc = false
+    cleanup_intermediate_files = false
+    instrain_quick_profile = false
+    bowtie2_samtools_only = false
+    bmtagger_db = "/efs/abundance_estimation/BMTAGGER_INDEX"
+    bmtagger_host = "T2T-CHM13v2.0"
+    publish_host_reads = false
+
+    // Process options
+    max_retries = 1
+
+    // LSF options
+    queue_size = 50
+    submit_rate_limit = '50/2min'
+}
+
+process {
+    executor = 'awsbatch'
+    queue = 'nextflow-queue'
+    container = 'ubuntu'
+
+    withName:INSTRAIN {
+        cpus = params.instrain_threads
+        memory = {10.GB + (25.GB * task.attempt)}
+        maxRetries = 3
+    }
+
+    withName:BOWTIE2SAMTOOLS {
+        cpus = params.bowtie2_samtools_threads
+        memory = {10.GB + (10.GB * task.attempt)}
+        maxRetries = 3
+    }
+}
+
+workDir = 's3://nextflowbucket4711/workdir/'
+
+aws {
+    region = 'eu-west-2'
+    accessKey = 'AMI_ACCESS_KEY'
+    secretKey = 'AMI_SECRET_KEY'
+    batch {
+        cliPath = '/home/ec2-user/miniconda/bin/aws' // Where the aws binary is installed on the EC2 image
+        volumes = '/efs' // The EFS mount on the EC2 image
+    }
+    client {
+        maxConnections = 20 // The default makes Nextflow unhappy...
+    }
+}
+
+
+// Helper functions
+def inherit_generic_config() {
+    config_url = params.generic_config_url ? params.generic_config_url : "${params.generic_config_base}/${params.generic_config_version}/configs/nextflow.config"
+    try {
+        includeConfig "${config_url}"
+    } catch (Exception e) {
+        System.err.println("ERROR: Could not load generic config: ${config_url}")
+        System.err.println("Encountered the following exception:")
+        throw e
+    }
+}

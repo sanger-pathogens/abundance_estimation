@@ -91,7 +91,7 @@ workflow {
 
     BOWTIE_INDEX(SUBSET_GENOMES.out.subset_genome)
 
-    GENERATE_STB(SOURMASH_GATHER.out.sourmash_genomes)
+    GENERATE_STB(SOURMASH_GATHER.out.sourmash_genomes,file(params.stb_file))
 
     if (params.skip_qc) {
         bowtie_mapping_ch = fastq_path_ch.join(BOWTIE_INDEX.out.bowtie_index)

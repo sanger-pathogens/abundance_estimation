@@ -1,6 +1,7 @@
 # Abundance estimation nextflow pipeline
 
 ## Usage
+
 ```
 nextflow run main.nf
       --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2. (mandatory)
@@ -28,27 +29,35 @@ For more information, run:
 `./generate_manifest_from_lanes.sh -h`
 
 If your data is not stored in the PaM informatics pipeline system, use the following method:
+
 ### Step 1:
+
 Obtain fastq paths:
 `ls -d -1 <path>/*.fastq.gz > fastq_paths.txt`
+
 ### Step 2:
+
 Generate manifest:
 `./generate_manifest.sh fastq_paths.txt`
 
 This will output the manifest to `manifest.csv` which can be fed into the nextflow pipeline
 
 ## Development
+
 For development, smaller test databases are available, these will significantly reduce the run time and resource requirements:
 8 CPUs and 50GB memory will be sufficient
 
 ## Dependencies
+
 This pipeline relies on the following modules:
+
 ```
 nextflow/22.10
 ISG/singularity/3.6.4
 ```
 
 ## Resource requirements
+
 `bowtie2samtools` - 250GB ( ~2hr) submits with 250Gb and then on retry escalate to 350Gb, 8 CPUs
 
 `inStrain` - 300 GB ( ~ 12hr) submits with 300Gb then on retry escalates to 400Gb, 8 CPUs
@@ -70,7 +79,7 @@ In this example the extention is `.fasta`
 To generate a sourmash database from these files, you first need to produce a sketch for each input fasta:
 
 ```
-sourmash sketch dna -p scaled=1000,k=31 db/*.fasta 
+sourmash sketch dna -p scaled=1000,k=31 db/*.fasta
 ```
 
 This will produce a collection of signature files ending in `.sig`:
@@ -98,11 +107,11 @@ ls *.sig > filelist
 Then run a loop over this list using the sourmash script to rename the signature to the filename:
 
 ```
-cat filelist | while read line; 
-do 
-    NAME=$(basename "$line" .fasta.sig) 
-    echo $NAME 
-    sourmash signature rename $NAME.fasta.sig "$NAME" -o $NAME.sig 
+cat filelist | while read line;
+do
+    NAME=$(basename "$line" .fasta.sig)
+    echo $NAME
+    sourmash signature rename $NAME.fasta.sig "$NAME" -o $NAME.sig
 done
 ```
 
@@ -125,3 +134,7 @@ And point to the genome dir where the .fasta files are stored:
 ```
 --genome_dir <path_to_fasta_files>
 ```
+
+## Amazon AWS
+
+See [the AWS README](README.aws.md).

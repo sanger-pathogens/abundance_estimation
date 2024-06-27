@@ -8,8 +8,10 @@ process SUBSET_GENOMES {
 
     output:
     tuple val(sample_id), path("subset_ref_database.fasta"), emit: subset_genome
+
     script:
-    """
-    ${projectDir}/bin/subset_fasta.sh ${sourmash_genomes} ${params.genome_dir} ${params.genomes_file_ext}
-    """
+    genome_dir=params.genome_dir
+    genomes_file_ext=params.genomes_file_ext
+    aws_cli=params.aws_cli
+    template "subset_fasta.sh"
 }

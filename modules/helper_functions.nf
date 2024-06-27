@@ -3,6 +3,9 @@ def validate_path_param(
     param,
     type="file",
     mandatory=true) {
+        if (param.startsWith("/efs/")) { // This is a hack to avoid checking the existence of files in the EFS
+            return 0
+        }
         valid_types=["file", "directory"]
         if (!valid_types.any { it == type }) {
                 log.error("Invalid type '${type}'. Possibilities are ${valid_types}.")

@@ -35,9 +35,10 @@ process SOURMASH_GATHER {
 
     script:
     sourmash_genomes="${sample_id}_sourmash_genomes.txt"
+
     """
     sourmash gather --dna ${sourmash_sketch} ${params.sourmash_db} -o sourmash.out
     # get species names out of sourmash output
-    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > ${sample_id}_sourmash_genomes.txt
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > ${sourmash_genomes}
     """
 }

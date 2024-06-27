@@ -1,0 +1,2 @@
+ID,R1,R2
+sample_id,s3://MY_BUCKET/MY_PATH/sample_id_1.fastq.gz,s3://MY_BUCKET/MY_PATH/sample_id_2.fastq.gz
