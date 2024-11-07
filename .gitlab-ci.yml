@@ -19,10 +19,6 @@ flake8:
   rules:
     - when: never
 
-.pipeline_deploy_to_farm:
-  variables:
-    FARM_NAME: "abundance_estimation"
-
 check_scan_results:
   variables:
     MEDIUM_LIMIT: 3
