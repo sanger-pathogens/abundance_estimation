@@ -12,7 +12,7 @@
 
 - [inStrain](https://doi.org/10.1038/s41587-020-00797-0)
 
-  > Olm, M.R., Crits-Christoph, A., Bouma-Gregson, K. et al. inStrain profiles population microdiversity from metagenomic data and sensitively detects shared microbial strains. Nat Biotechnol 39, 727–736 (2021). 
+  > Olm, M.R., Crits-Christoph, A., Bouma-Gregson, K. et al. inStrain profiles population microdiversity from metagenomic data and sensitively detects shared microbial strains. Nat Biotechnol 39, 727–736 (2021).
 
 ## Software packaging/containerisation tools
 
