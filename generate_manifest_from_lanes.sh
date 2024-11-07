@@ -37,6 +37,7 @@ do
       l) lanes_file="${OPTARG}";;
       m) manifest_file="${OPTARG}";;
       h) usage; exit 0;;
+      *) echo "Error: this argument is not supported: ${arg}" ; exit 1;;
     esac
 done
 
