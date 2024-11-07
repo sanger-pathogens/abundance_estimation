@@ -20,9 +20,7 @@ EOT
 
 # validate file paths
 validate_filepath () {
-    if [[ -f $1 ]]; then
-      path_valid=true
-    else
+    if [[ ! -f $1 ]]; then
       echo "$1 is not a valid filepath!" >&2
       exit 1
   fi
