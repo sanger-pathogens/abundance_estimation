@@ -65,7 +65,7 @@ do
   read_2=$(grep -w "${lane}_2.fastq.gz" Temp_file_path.txt)
   if [[ ! -z ${read_1} ]] || [[ ! -z ${read_2} ]]
   then
-      echo ${lane}","${read_1}","${read_2} >> ${manifest_file}
+      echo "${lane}","${read_1}","${read_2}" >> ${manifest_file}
   else
       echo "No data available for ${lane}, skipping..."
   fi
