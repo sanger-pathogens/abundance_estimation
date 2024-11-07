@@ -10,6 +10,8 @@ proc ModulesHelp { } {
   puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
   puts stderr "Executables:"
   puts stderr "\tabundance_estimation"
+  puts stderr "\tgenerate_manifest.sh"
+  puts stderr "\tgenerate_manifest_from_lanes.sh"
   puts stderr "Home page: {{repo_url}}"
 }
 
