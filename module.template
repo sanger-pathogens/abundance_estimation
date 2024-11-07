@@ -9,7 +9,7 @@ proc ModulesHelp { } {
 
   puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
   puts stderr "Executables:"
-  puts stderr "\tstrain-mapper"
+  puts stderr "\tabundance_estimation"
   puts stderr "Home page: {{repo_url}}"
 }
 
@@ -24,7 +24,7 @@ module switch ISG/singularity
 
 # Load message
 if { [ module-info mode load ] } {
-    puts stderr "\tModule loaded. For more information run 'module help abundance_estimation/{{version}}' or check https://ssg-confluence.internal.sanger.ac.uk/display/PaMI/Strain+mapper+read+mapping+pipeline."
+    puts stderr "\tModule loaded. For more information run 'module help abundance_estimation/{{version}}' or check https://ssg-confluence.internal.sanger.ac.uk/display/PaMI/Abundance+estimation+Nextflow+pipeline."
 }
 
 # Conflicts
