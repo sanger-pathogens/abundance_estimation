@@ -1,0 +1,36 @@
+#%Module1.0#####################################################################
+##
+## Parasites and Microbes abundance_estimation {{version}}
+##
+
+# help setup
+proc ModulesHelp { } {
+  global version modroot
+
+  puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
+  puts stderr "Executables:"
+  puts stderr "\tstrain-mapper"
+  puts stderr "Home page: {{repo_url}}"
+}
+
+# Whatis setup
+module-whatis "Custom deployment managed by pathogen informatics: {{path}}"
+module-whatis "Executables:"
+module-whatis "abundance_estimation"
+
+# Load prerequisite modules
+module switch nextflow
+module switch ISG/singularity
+
+# Load message
+if { [ module-info mode load ] } {
+    puts stderr "\tModule loaded. For more information run 'module help abundance_estimation/{{version}}' or check https://ssg-confluence.internal.sanger.ac.uk/display/PaMI/Strain+mapper+read+mapping+pipeline."
+}
+
+# Conflicts
+conflict abundance_estimation
+
+# Add wrappers to PATH
+prepend-path PATH "{{path}}/abundance_estimation"
+prepend-path PATH "{{path}}/abundance_estimation/generate_manifest.sh"
+prepend-path PATH "{{path}}/abundance_estimation/generate_manifest_from_lanes.sh"

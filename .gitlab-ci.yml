@@ -1,0 +1,16 @@
+include:
+  - project: "sanger-pathogens/templates/ci-templates"
+    ref: "$CI_CD_TEMPLATES_LATEST_STABLE"
+    file: "Pipelines/PaM-Info-Nextflow.gitlab-ci.yml"
+
+talisman:
+  variables:
+    TALISMAN_OPTS: "--scan --ignoreHistory"
+
+.pipeline_deploy_to_farm:
+  variables:
+    FARM_NAME: "abundance_estimation"
+
+check_scan_results:
+  variables:
+    MEDIUM_LIMIT: 3
