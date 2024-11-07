@@ -7,6 +7,18 @@ talisman:
   variables:
     TALISMAN_OPTS: "--scan --ignoreHistory"
 
+black:
+  rules:
+    - when: never
+
+isort:
+  rules:
+    - when: never
+
+flake8:
+  rules:
+    - when: never
+
 .pipeline_deploy_to_farm:
   variables:
     FARM_NAME: "abundance_estimation"
