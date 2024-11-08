@@ -10,8 +10,6 @@ proc ModulesHelp { } {
   puts stderr "Custom deployment managed by pathogen informatics: {{path}}"
   puts stderr "Executables:"
   puts stderr "\tabundance_estimation"
-  puts stderr "\tgenerate_manifest.sh"
-  puts stderr "\tgenerate_manifest_from_lanes.sh"
   puts stderr "Home page: {{repo_url}}"
 }
 
@@ -34,5 +32,3 @@ conflict abundance_estimation
 
 # Add wrappers to PATH
 prepend-path PATH "{{path}}/abundance_estimation"
-prepend-path PATH "{{path}}/abundance_estimation/generate_manifest.sh"
-prepend-path PATH "{{path}}/abundance_estimation/generate_manifest_from_lanes.sh"
