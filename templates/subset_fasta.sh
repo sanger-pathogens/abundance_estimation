@@ -2,8 +2,8 @@
 # shellcheck disable=SC1083,SC2034,SC2050,SC2154
 # above directive prevents shellcheck to report occurence of these potential issues:
 # SC1083: use of litteral syntax \${}; this required as this is a template script
-# SC2034: apparently unused variables, which derives from the above as variables are being called with escaped $
-# SC2050 : expressions appear constant, which derives from the above as variables are being called with escaped $
+# SC2034: apparently unused variables, which derives from the above as variables are being called with litteral syntax 
+# SC2050 : expressions appear constant, which derives from the above as variables are being called with litteral syntax
 # SC2154: variables referenced but apparently not assigned; this results from nextflow variables being injected into the bash code
 while read genome
     do
