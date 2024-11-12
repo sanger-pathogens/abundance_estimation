@@ -10,7 +10,7 @@ while read genome
       genome_file_path="${genome_dir}/\${genome_split_to_path}/\${genome}${genomes_file_ext}"
       [ -e \${genome_file_path} ] || genome_file_path="${genome_dir}/\${genome}${genomes_file_ext}"
 
-      if [[ \${genome_file_path} == s3:* ]] # S3 mount
+      if [[ "\${genome_file_path}" =~ s3:.* ]] # S3 mount
       then
         ${aws_cli} s3 --no-progress cp \${genome_file_path} - | zcat >> subset_ref_database.fasta
       else # File system
