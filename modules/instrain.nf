@@ -1,6 +1,6 @@
 process INSTRAIN {
     tag "${sample_id}"
-    label 'time_queue_from_normal'
+    label 'time_queue_from_normal2'
 
     container 'quay.io/sangerpathogens/instrain:1.9.0'
 
