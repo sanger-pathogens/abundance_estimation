@@ -11,6 +11,15 @@ while read genome
       genome_file_path="${genome_dir}/database/\${genome_split_to_path}/\${genome}${genomes_file_ext}"
       [ -e \${genome_file_path} ] || genome_file_path="${genome_dir}/\${genome}${genomes_file_ext}"
 
+      if [[ ! -e \${genome_file_path} ]]
+      then
+        genome_index_path="${genome_dir}/indexed_genomes.txt"
+        # If the genome is indexed, we can get the path from the index file
+        if [[ -e "\${genome_index_path}" ]]
+        then genome_file_path=$(grep "^\${genome}@" "\$genome_index_path" | cut -d '@' -f2) 
+        fi 
+      fi
+
       if [[ "\${genome_file_path}" =~ s3:.* ]] # S3 mount
       then
         ${aws_cli} s3 --no-progress cp \${genome_file_path} - | zcat >> subset_ref_database.fasta
