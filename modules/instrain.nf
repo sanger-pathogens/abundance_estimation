@@ -37,21 +37,22 @@ process INSTRAIN {
     """
 }
 
-process SUBSET_STB {
+process GENERATE_STB {
     label 'cpu_1'
     label 'mem_1'
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes), path(stb_ch)
+    tuple val(sample_id), path(sourmash_genomes)
+    path(stb_file)
 
     output:
-    tuple val(sample_id), path(outfile), emit: sub_stb_ch
+    tuple val(sample_id), path(outfile), emit: stb_ch
 
     script:
     outfile="${sample_id}_subset.stb"
     """
     sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
-    grep -w -f genomes.txt ${stb_ch} > ${outfile}
+    grep -w -f genomes.txt ${stb_file} > ${outfile}
     """
 }
