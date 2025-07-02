@@ -28,7 +28,8 @@ process SOURMASH_GATHER {
     container 'quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0'
 
     input:
-    tuple val(sample_id), path(sourmash_sketch), path(stb_ch)
+    tuple val(sample_id), path(sourmash_sketch)
+    path(stb_ch)
 
     output:
     tuple val(sample_id), path(sourmash_genomes), emit: sourmash_genomes
