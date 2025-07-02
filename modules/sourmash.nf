@@ -28,7 +28,7 @@ process SOURMASH_GATHER {
     container 'quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0'
 
     input:
-    tuple val(sample_id), path(sourmash_sketch)
+    tuple val(sample_id), path(sourmash_sketch), path(stb_ch)
 
     output:
     tuple val(sample_id), path(sourmash_genomes), emit: sourmash_genomes
@@ -39,6 +39,6 @@ process SOURMASH_GATHER {
     """
     sourmash gather --dna ${sourmash_sketch} ${params.sourmash_db} -o sourmash.out
     # get species names out of sourmash output
-    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > ${sourmash_genomes}
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' | while IFS= read -r line; do grep "\$line" ${stb_ch} | cut -f2 | cut -d "_" -f1-2; done > ${sourmash_genomes}
     """
 }
