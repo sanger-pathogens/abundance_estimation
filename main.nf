@@ -48,7 +48,7 @@ include { MERGE_FASTQS } from './modules/merge_fastq.nf'
 include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
 include { SUBSET_GENOMES } from './modules/subset_fasta.nf'
 include { BOWTIE_INDEX; BOWTIE2SAMTOOLS; GET_OVERALL_MAPPING_RATE } from './modules/bowtie.nf'
-include { SUBSET_STB; INSTRAIN } from './modules/instrain.nf'
+include { GENERATE_STB; INSTRAIN } from './modules/instrain.nf'
 
 //
 // SUBWORKFLOWS
@@ -85,15 +85,13 @@ workflow {
 
     SOURMASH_SKETCH(MERGE_FASTQS.out.merged_fastq)
 
-    stb_ch = Channel.fromPath(params.stb_file)
-
-    SOURMASH_GATHER(SOURMASH_SKETCH.out.sketch,stb_ch)
+    SOURMASH_GATHER(SOURMASH_SKETCH.out.sketch)
 
     SUBSET_GENOMES(SOURMASH_GATHER.out.sourmash_genomes)
 
     BOWTIE_INDEX(SUBSET_GENOMES.out.subset_genome)
 
-    SUBSET_STB(SOURMASH_GATHER.out.sourmash_genomes,stb_ch)
+    GENERATE_STB(SOURMASH_GATHER.out.sourmash_genomes,file(params.stb_file))
 
     if (params.skip_qc) {
         bowtie_mapping_ch = fastq_path_ch.join(BOWTIE_INDEX.out.bowtie_index)
@@ -113,7 +111,7 @@ workflow {
     GET_OVERALL_MAPPING_RATE(BOWTIE2SAMTOOLS.out.map_rate_ch.collect())
 
     if (!params.bowtie2_samtools_only) {
-        instrain_profiling_ch = BOWTIE2SAMTOOLS.out.bam_file.join(SUBSET_STB.out.sub_stb_ch).join(SUBSET_GENOMES.out.subset_genome)
+        instrain_profiling_ch = BOWTIE2SAMTOOLS.out.bam_file.join(GENERATE_STB.out.stb_ch).join(SUBSET_GENOMES.out.subset_genome)
         INSTRAIN(instrain_profiling_ch)
     }
 
