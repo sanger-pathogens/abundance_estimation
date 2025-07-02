@@ -43,7 +43,8 @@ process SUBSET_STB {
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes), path(stb_ch)
+    tuple val(sample_id), path(sourmash_genomes)
+    path(stb_ch)
 
     output:
     tuple val(sample_id), path(outfile), emit: sub_stb_ch
