@@ -56,7 +56,7 @@ process SUBSET_STB {
     grep -w -f genomes.txt ${stb_ch} > ${outfile} 
     if [[ ! -s "${outfile}" ]]; then
 	echo "trying if statement"
-	grep -F -f ${sourmash_genomes} ${stb_ch} > ${outfile}"
+	grep -F -f ${sourmash_genomes} ${stb_ch} > ${outfile}
     fi
     """
 }
