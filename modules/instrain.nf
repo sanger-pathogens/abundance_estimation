@@ -53,6 +53,12 @@ process SUBSET_STB {
     outfile="${sample_id}_subset.stb"
     """
     sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
-    grep -w -f genomes.txt ${stb_ch} > ${outfile}
+    grep -w -f genomes.txt ${stb_ch} > ${outfile} 
+    echo "output works"
+    echo "outfile : ${outfile}"
+    if [[ ! -s "${outfile}" ]]; then
+	echo "trying if statement"
+	grep -F -f ${sourmash_genomes} ${stb_ch} > izzie_test.txt
+    fi
     """
 }

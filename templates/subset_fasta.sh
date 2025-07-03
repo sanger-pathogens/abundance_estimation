@@ -11,11 +11,13 @@ while read genome
       genome_file_path="${genome_dir}/database/\${genome_split_to_path}/\${genome}${genomes_file_ext}"
       [ -e \${genome_file_path} ] || genome_file_path="${genome_dir}/\${genome}${genomes_file_ext}"
       
-      if [ ! -e "${genome_file_path}" ]; then
+      if [ ! -e \${genome_file_path} ]; then
         # if the file doesn't exist, find the find any matching file with the same genome prefix and genome extension
-        find_file=$(ls "${genome_dir}/${genome}"*${genomes_file_ext} 2>/dev/null | head -n 1)
-        if [ -n "${find_file}" ]; then
-          genome_file_path="${find_file}"
+        echo "genome directory : ${genome_dir}"
+	echo "genome accession : \${genome}"
+	find_file=\$(ls "${genome_dir}/database/\${genome_split_to_path}/\${genome}"*${genomes_file_ext} 2>/dev/null | head -n 1)
+        if [ -n "\${find_file}" ]; then
+          genome_file_path="\${find_file}"
         fi
       fi
 
