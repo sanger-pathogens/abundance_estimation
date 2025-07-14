@@ -13,5 +13,7 @@ process SUBSET_GENOMES {
     genome_dir=params.genome_dir
     genomes_file_ext=params.genomes_file_ext
     aws_cli=params.aws_cli
-    template "subset_fasta.sh"
+    """
+    subset_fasta.py ${genome_dir} ${sourmash_genomes} 
+    """
 }

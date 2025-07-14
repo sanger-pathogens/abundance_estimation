@@ -44,7 +44,7 @@ process SUBSET_STB {
 
     input:
     tuple val(sample_id), path(sourmash_genomes)
-    path(stb_ch)
+    path(stb_file)
 
     output:
     tuple val(sample_id), path(outfile), emit: sub_stb_ch
@@ -52,11 +52,6 @@ process SUBSET_STB {
     script:
     outfile="${sample_id}_subset.stb"
     """
-    sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
-    grep -w -f genomes.txt ${stb_ch} > ${outfile} 
-    if [[ ! -s "${outfile}" ]]; then
-	echo "trying if statement"
-	grep -F -f ${sourmash_genomes} ${stb_ch} > ${outfile}
-    fi
+    grep -w -f ${sourmash_genomes} ${stb_file} > ${outfile}
     """
 }
