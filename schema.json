@@ -1,0 +1,71 @@
+{ 
+    "pipeline": "Abundance Estimation",
+    "params": {
+        "Input options": {
+            "manifest": {
+                "help_text": "Manifest containing paths to fastq files. with headers ID,R1,R2.",
+                "default": "false"
+            },
+
+            "outdir": {
+                "help_text": "Name of results folder.",
+                "default": "./results"
+            },
+
+            "bowtie2_samtools_threads": {
+                "help_text": "Threads used by Bowtie2 and Samtools",
+                "default": 4
+            },
+
+            "instrain_threads": {
+                "help_text": "Threads for inStrain.",
+                "default": 4
+            },
+
+            "instrain_full_output": {
+                "help_text": "Return full inStrain output.",
+                "default": "false"
+            },
+
+            "cleanup_intermediate_files": {
+                "help_text": "Cleanup intermediate files.",
+                "default": "false"
+            },
+
+            "skip_qc": {
+                "help_text": "Skip metawrap qc step.",
+                "default": "false"
+            },
+
+            "stb_file": {
+                "help_text": "Supply the sample‑to‑bin (STB) mapping file.",
+                "default": "/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb"
+            },
+
+            "genome_dir": {
+                "help_text": "Supply the directory containing reference genomes.",
+                "default": "/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226"
+            },
+
+            "sourmash_db": {
+                "help_text": "Supply the sourmash zip database.",
+                "default": "/data/pam/software/sourmash/signatures_zipped/gtdb_genomes_reps_r220.zip"
+            },
+
+            "instrain_quick_profile": {
+                "help_text": "Enable inStrain's quick_profile option.",
+                "default": "false"
+            },
+
+            "bowtie2_samtools_only": {
+                "help_text": "Run only the bowtie2_samtools process.",
+                "default": "false"
+            },
+
+            "help": {
+                "help_text": "Print the help message.",
+                "default": "false"
+            }
+        }
+    }
+}

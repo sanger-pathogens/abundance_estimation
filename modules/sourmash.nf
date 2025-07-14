@@ -29,16 +29,18 @@ process SOURMASH_GATHER {
 
     input:
     tuple val(sample_id), path(sourmash_sketch)
-
+    path(stb_file)
+    
     output:
     tuple val(sample_id), path(sourmash_genomes), emit: sourmash_genomes
 
     script:
     sourmash_genomes="${sample_id}_sourmash_genomes.txt"
-
     """
     sourmash gather --dna ${sourmash_sketch} ${params.sourmash_db} -o sourmash.out
-    # get species names out of sourmash output
-    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > ${sourmash_genomes}
+    # get accessions out of sourmash output
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > sourmash_accessions.txt
+    # find genome file using accessions and grabbing them from the stb file
+    grep -F -f sourmash_accessions.txt ${stb_file} | awk -F '\\t' '{ print \$2 }' | sort -u > ${sourmash_genomes}
     """
 }
