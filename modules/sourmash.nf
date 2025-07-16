@@ -29,8 +29,8 @@ process SOURMASH_GATHER {
 
     input:
     tuple val(sample_id), path(sourmash_sketch)
-    path(stb_file)
-    
+    tuple val(sample_id), path(sourmash_sketch), path(stb)
+
     output:
     tuple val(sample_id), path(sourmash_genomes), emit: sourmash_genomes
 
