@@ -45,8 +45,9 @@ def subset_fasta(genome_dir, sourmash_genomes):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        print("Usage: python subset_fasta.py <genome_dir> <sourmash_genomes>")
+        raise TypeError("f"two() takes 2 positional arguments but {len(sys.argv)-1} were given\nUsage: {sys.argv[0} <genome_dir> <sourmash_genomes>")
         sys.exit(1)
+
 
     genome_dir = sys.argv[1]
     sourmash_genomes = sys.argv[2]
