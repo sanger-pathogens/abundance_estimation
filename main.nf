@@ -29,10 +29,14 @@ if (params.help) {
 include { validate_parameters } from './modules/helper_functions.nf'
 include { CLEANUP_SORTED_BAM_FILES; CLEANUP_TRIMMED_FASTQ_FILES; CLEANUP_INSTRAIN_OUTPUT } from './modules/cleanup.nf'
 include { MERGE_FASTQS } from './modules/merge_fastq.nf'
-include { SOURMASH_SKETCH; SOURMASH_GATHER } from './modules/sourmash.nf'
-include { SUBSET_GENOMES } from './modules/subset_fasta.nf'
-include { BOWTIE_INDEX; BOWTIE2SAMTOOLS; GET_OVERALL_MAPPING_RATE } from './modules/bowtie.nf'
-include { SUBSET_STB; INSTRAIN } from './modules/instrain.nf'
+include { SOURMASH_SKETCH; 
+          SOURMASH_GATHER          } from './modules/sourmash.nf'
+include { SUBSET_GENOMES           } from './modules/subset_fasta.nf'
+include { BOWTIE_INDEX; 
+          BOWTIE2SAMTOOLS; 
+          GET_OVERALL_MAPPING_RATE } from './modules/bowtie.nf'
+include { SUBSET_STB; 
+          INSTRAIN                 } from './modules/instrain.nf'
 
 //
 // SUBWORKFLOWS
