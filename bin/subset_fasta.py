@@ -2,7 +2,7 @@
 
 
 """
-    Create a fasta file containing fasta sequences from the sourmash matches
+Create a fasta file containing fasta sequences from the sourmash matches
 """
 
 import sys 
