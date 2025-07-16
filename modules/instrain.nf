@@ -43,15 +43,15 @@ process SUBSET_STB {
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes)
-    path(stb_file)
+    tuple val(sample_id), path(sourmash_genomes), path(stb)
 
     output:
-    tuple val(sample_id), path(outfile), emit: sub_stb_ch
+    tuple val(sample_id), path(outfile), emit: sub_stb
 
     script:
     outfile="${sample_id}_subset.stb"
     """
-    grep -w -f ${sourmash_genomes} ${stb_file} > ${outfile}
+    sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
+    grep -w -f genomes.txt ${stb} > ${outfile}
     """
 }
