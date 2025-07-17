@@ -9,7 +9,7 @@ process INSTRAIN {
     publishDir "${params.outdir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
     
     input:
-    tuple val(sample_id), path(sorted_bam), path(stb_file), path(genome_file)
+    tuple val(sample_id), path(sorted_bam), path(stb), path(genome_file)
 
     output:
     path ("${sample_id}_instrain_output"), optional: true
@@ -26,9 +26,9 @@ process INSTRAIN {
     pwd > workdir.txt
     if $params.instrain_quick_profile
     then
-        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p ${task.cpus} -s $stb_file
+        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p ${task.cpus} -s $stb
     else
-        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p ${task.cpus} -s $stb_file --database_mode --skip_plot_generation
+        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p ${task.cpus} -s $stb --database_mode --skip_plot_generation
     fi
     if ! $params.instrain_full_output && ! $params.instrain_quick_profile
     then
@@ -43,7 +43,8 @@ process SUBSET_STB {
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes), path(stb)
+    tuple val(sample_id), path(sourmash_genomes)
+    path(stb)
 
     output:
     tuple val(sample_id), path(outfile), emit: sub_stb
