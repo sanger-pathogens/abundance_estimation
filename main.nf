@@ -73,8 +73,6 @@ workflow {
 
     SOURMASH_SKETCH(MERGE_FASTQS.out.merged_fastq)
 
-    /*stb_ch = Channel.fromPath(params.stb_file)*/
-
     stb_ch = Channel.fromPath(params.stb_file)
     SOURMASH_SKETCH.out.sketch
     | combine(stb_ch)
@@ -106,7 +104,7 @@ workflow {
     GET_OVERALL_MAPPING_RATE(BOWTIE2SAMTOOLS.out.map_rate_ch.collect())
  
     if (!params.bowtie2_samtools_only) {
-        instrain_profiling_ch = BOWTIE2SAMTOOLS.out.bam_file.join(SUBSET_STB.out.sub_stb_ch).join(SUBSET_GENOMES.out.subset_genome)
+        instrain_profiling_ch = BOWTIE2SAMTOOLS.out.bam_file.join(SUBSET_STB.out.sub_stb).join(SUBSET_GENOMES.out.subset_genome)
         INSTRAIN(instrain_profiling_ch)
     }
 
