@@ -75,7 +75,10 @@ workflow {
 
     /*stb_ch = Channel.fromPath(params.stb_file)*/
 
-    SOURMASH_GATHER(SOURMASH_SKETCH.out.sketch,file(params.stb_file)/*stb_ch*/)
+    stb_ch = Channel.fromPath(params.stb_file)
+    SOURMASH_SKETCH.out.sketch
+    | combine(stb_ch)
+    | SOURMASH_GATHER
 
     SUBSET_GENOMES(SOURMASH_GATHER.out.sourmash_genomes)
 
