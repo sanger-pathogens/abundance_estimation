@@ -1,6 +1,9 @@
 process INSTRAIN {
     tag "${sample_id}"
+    label "cpu_4"
+    label 'mem_20'
     label 'time_queue_from_normal'
+    maxRetries 3
 
     container 'quay.io/sangerpathogens/instrain:1.9.0'
 
@@ -39,12 +42,11 @@ process INSTRAIN {
 
 process SUBSET_STB {
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_50M'
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes)
-    path(stb)
+    tuple val(sample_id), path(sourmash_genomes), path(stb)
 
     output:
     tuple val(sample_id), path(outfile), emit: sub_stb
@@ -52,7 +54,6 @@ process SUBSET_STB {
     script:
     outfile="${sample_id}_subset.stb"
     """
-    sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
-    grep -w -f genomes.txt ${stb} > ${outfile}
+    grep -w -f ${sourmash_genomes} ${stb} > ${outfile}
     """
 }

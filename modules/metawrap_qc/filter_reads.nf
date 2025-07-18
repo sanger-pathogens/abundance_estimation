@@ -1,7 +1,7 @@
 process FILTER_HOST_READS {
     tag "${sample_id}"
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_250M'
     label 'time_queue_from_normal'
 
     container 'quay.io/sangerpathogens/metawrap_qc_python:1.0'

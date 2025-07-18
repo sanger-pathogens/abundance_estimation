@@ -1,7 +1,7 @@
 process MERGE_FASTQS {
     tag "${sample_id}"
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_50M'
     label 'time_queue_from_normal'
 
     container 'quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0'

@@ -1,6 +1,6 @@
 process COLLATE_STATS {
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_50M'
     label 'time_queue_from_normal'
 
     publishDir "${params.outdir}/metawrap_qc", mode: 'copy', overwrite: true, pattern: "*_statistics.csv"

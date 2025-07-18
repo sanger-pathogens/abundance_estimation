@@ -1,6 +1,6 @@
 process BOWTIE_INDEX {
     label 'cpu_4'
-    label 'mem_32'
+    label 'mem_4'
     label 'time_queue_from_normal'
 
     container 'quay.io/sangerpathogens/bowtie2-samtools:1.1-c1'
@@ -19,7 +19,10 @@ process BOWTIE_INDEX {
 
 process BOWTIE2SAMTOOLS {
     tag "${sample_id}"
+    label "cpu_4"
+    label 'mem_8'
     label 'time_queue_from_normal'
+    maxRetries 3
 
     container 'quay.io/sangerpathogens/bowtie2-samtools:1.1-c1'
 
@@ -42,6 +45,10 @@ process BOWTIE2SAMTOOLS {
 }
 
 process GET_OVERALL_MAPPING_RATE {
+    label 'cpu_1'
+    label 'mem_50M'
+    label 'time_queue_from_normal'
+    
     publishDir "${params.outdir}/mapping_rates/", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv', saveAs: { filename -> "${workflow.start}_mapping_rates.csv" }
     
     input:

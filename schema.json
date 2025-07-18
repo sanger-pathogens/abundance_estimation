@@ -12,16 +12,6 @@
         "default": "./results"
       },
 
-      "bowtie2_samtools_threads": {
-        "help_text": "Threads used by Bowtie2 and Samtools",
-        "default": 4
-      },
-
-      "instrain_threads": {
-        "help_text": "Threads for inStrain.",
-        "default": 4
-      },
-
       "instrain_full_output": {
         "help_text": "Return full inStrain output.",
         "default": "false"
