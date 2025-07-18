@@ -45,10 +45,6 @@ process BOWTIE2SAMTOOLS {
 }
 
 process GET_OVERALL_MAPPING_RATE {
-    label 'cpu_1'
-    label 'mem_50M'
-    label 'time_queue_from_normal'
-    
     publishDir "${params.outdir}/mapping_rates/", mode: 'copy', overwrite: true, pattern: 'mapping_rates.csv', saveAs: { filename -> "${workflow.start}_mapping_rates.csv" }
     
     input:
