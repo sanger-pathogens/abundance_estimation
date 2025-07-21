@@ -1,7 +1,7 @@
 process INSTRAIN {
     tag "${sample_id}"
     label "cpu_4"
-    label 'mem_20'
+    label 'mem_32'
     label 'time_queue_from_normal'
     maxRetries 3
 
