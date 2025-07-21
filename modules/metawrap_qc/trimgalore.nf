@@ -1,7 +1,7 @@
 process TRIMGALORE {
     tag "${sample_id}"
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_50M'
     label 'time_queue_from_normal'
 
     container 'quay.io/sangerpathogens/trimgalore:v0.4.4'

@@ -6,6 +6,8 @@
 nextflow run main.nf
       --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2. (mandatory)
       --outdir                        Name of results folder. [default: ./results] (optional)
+      --bowtie2_samtools_threads      Threads for bowtie2 and samtools. [default: 4] (optional)
+      --instrain_threads              Threads for instrain. [default: 4] (optional)
       --instrain_full_output          Get full instrain output. [default: false] (optional)
       --cleanup_intermediate_files    Cleanup intermediate files. [default: false] (optional)
       --skip_qc                       Skip metawrap qc step. [default: false] (optional)
