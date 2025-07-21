@@ -1,7 +1,7 @@
 process SOURMASH_SKETCH {
     tag "${sample_id}"
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_100M'
     label 'time_queue_from_normal'
 
     container 'quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0'
@@ -22,23 +22,24 @@ process SOURMASH_SKETCH {
 process SOURMASH_GATHER {
     tag "${sample_id}"
     label 'cpu_1'
-    label 'mem_4'
+    label 'mem_500M'
     label 'time_queue_from_normal'
 
     container 'quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0'
 
     input:
-    tuple val(sample_id), path(sourmash_sketch)
+    tuple val(sample_id), path(sourmash_sketch), path(stb)
 
     output:
     tuple val(sample_id), path(sourmash_genomes), emit: sourmash_genomes
 
     script:
     sourmash_genomes="${sample_id}_sourmash_genomes.txt"
-
     """
     sourmash gather --dna ${sourmash_sketch} ${params.sourmash_db} -o sourmash.out
-    # get species names out of sourmash output
-    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > ${sourmash_genomes}
+    # get accessions out of sourmash output
+    tail -n +2 sourmash.out | awk -F "," '{ print \$10 }' | sed 's|[][]||g' | sed 's|"||g' | awk '{ print \$1 }' > sourmash_accessions.txt
+    # find genome file using accessions and grabbing them from the stb file
+    grep -F -f sourmash_accessions.txt ${stb} | awk -F '\\t' '{ print \$2 }' | sort -u > ${sourmash_genomes}
     """
 }

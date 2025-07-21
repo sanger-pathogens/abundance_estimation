@@ -1,6 +1,9 @@
 process INSTRAIN {
     tag "${sample_id}"
+    label "cpu_4"
+    label 'mem_32'
     label 'time_queue_from_normal'
+    maxRetries 3
 
     container 'quay.io/sangerpathogens/instrain:1.9.0'
 
@@ -9,7 +12,7 @@ process INSTRAIN {
     publishDir "${params.outdir}", mode: 'copy', overwrite: true, pattern: '*.tsv'
     
     input:
-    tuple val(sample_id), path(sorted_bam), path(stb_file), path(genome_file)
+    tuple val(sample_id), path(sorted_bam), path(stb), path(genome_file)
 
     output:
     path ("${sample_id}_instrain_output"), optional: true
@@ -26,9 +29,9 @@ process INSTRAIN {
     pwd > workdir.txt
     if $params.instrain_quick_profile
     then
-        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p ${task.cpus} -s $stb_file
+        inStrain quick_profile $sorted_bam $genome_file -o ${sample_id}_instrain_quick_profile_output -p ${task.cpus} -s $stb
     else
-        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p ${task.cpus} -s $stb_file --database_mode --skip_plot_generation
+        inStrain profile $sorted_bam $genome_file -o ${sample_id}_instrain_output -p ${task.cpus} -s $stb --database_mode --skip_plot_generation
     fi
     if ! $params.instrain_full_output && ! $params.instrain_quick_profile
     then
@@ -37,22 +40,20 @@ process INSTRAIN {
     """
 }
 
-process GENERATE_STB {
+process SUBSET_STB {
     label 'cpu_1'
-    label 'mem_1'
+    label 'mem_50M'
     label 'time_queue_from_normal'
 
     input:
-    tuple val(sample_id), path(sourmash_genomes)
-    path(stb_file)
+    tuple val(sample_id), path(sourmash_genomes), path(stb)
 
     output:
-    tuple val(sample_id), path(outfile), emit: stb_ch
+    tuple val(sample_id), path(outfile), emit: sub_stb
 
     script:
     outfile="${sample_id}_subset.stb"
     """
-    sed 's|\$|${params.genomes_file_ext}|g' ${sourmash_genomes} > genomes.txt
-    grep -w -f genomes.txt ${stb_file} > ${outfile}
+    grep -w -f ${sourmash_genomes} ${stb} > ${outfile}
     """
 }

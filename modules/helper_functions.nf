@@ -62,9 +62,7 @@ def validate_parameters() {
     errors += validate_path_param("--stb_file", params.stb_file)
     errors += validate_path_param("--sourmash_db", params.sourmash_db)
     errors += validate_path_param("--genome_dir", params.genome_dir, type="directory")
-    errors += validate_number_param("--bowtie2_samtools_threads", params.bowtie2_samtools_threads)
     errors += validate_number_param("--queue_size", params.queue_size)
-    errors += validate_number_param("--instrain_threads", params.instrain_threads)
     errors += validate_outdir(params.outdir)
 
     if (params.instrain_full_output && params.instrain_quick_profile) {
