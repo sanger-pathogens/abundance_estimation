@@ -17,7 +17,7 @@ nextflow run main.nf \
   --bowtie2_samtools_only false
 ```
 
-Note: parameters marked with (optional*) are only optional if you use the default GTDB resources.
+Note: parameters marked with (optional\*) are only optional if you use the default GTDB resources.
 If you supply a custom `--sourmash_db`, you must also provide matching `--genome_dir`, `--genomes_file_ext`,
 and `--stb_file` built from the same reference set.
 
@@ -28,10 +28,10 @@ and `--stb_file` built from the same reference set.
 - `--instrain_full_output` Get full inStrain output. [default: false] (optional)
 - `--cleanup_intermediate_files` Cleanup intermediate files. [default: false] (optional)
 - `--skip_qc` Skip metawrap qc step. [default: false] (optional)
-- `--stb_file` Supply stb file. [default: `/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb`] (optional*)
-- `--genome_dir` Supply genome folder. [default: `/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226`] (optional*)
-- `--sourmash_db` Supply sourmash database. [default: `/data/pam/software/sourmash/GTDB/release226/gtdb-rs226-reps.k31.sig.zip`] (optional*)
-- `--genomes_file_ext` File extension for reference genomes (e.g. `.fna`, `.fasta`, `_genomic.fna.gz`). [default: `.fasta`] (optional*)
+- `--stb_file` Supply stb file. [default: `/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb`] (optional\*)
+- `--genome_dir` Supply genome folder. [default: `/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226`] (optional\*)
+- `--sourmash_db` Supply sourmash database. [default: `/data/pam/software/sourmash/GTDB/release226/gtdb-rs226-reps.k31.sig.zip`] (optional\*)
+- `--genomes_file_ext` File extension for reference genomes (e.g. `.fna`, `.fasta`, `_genomic.fna.gz`). [default: `.fasta`] (optional\*)
 - `--instrain_quick_profile` Use quick-profile option for inStrain. [default: false] (optional)
 - `--bowtie2_samtools_only` Only run bowtie2_samtools process. [default: false] (optional)
 - `--help` Print this help message. (optional)
@@ -192,7 +192,6 @@ Then pass it to the pipeline:
 
 Make sure the `scaled` parameter used to build the sourmash database matches the pipeline sketch settings.
 If they do not match, sourmash gather may return few or no hits.
-
 
 ## Amazon AWS
 
