@@ -43,7 +43,7 @@
       },
 
       "genomes_file_ext": {
-        "help_text": "File extension for reference genomes (e.g. .fna, .fasta, _genomic.fna.gz). Required when using a custom sourmash database.",
+        "help_text": "File extension for reference genomes (e.g. .fna, .fna.gz .fasta, .fasta.gz, .fa, .fa.gz). Required when using a custom sourmash database.",
         "default": ".fasta"
       },
 
