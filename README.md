@@ -192,7 +192,7 @@ Then pass it to the pipeline:
 ```
 
 Make sure the `scaled` parameter used to build the sourmash database matches the pipeline sketch settings.
-If they do not match, sourmash gather may return few or no hits.
+If they do not match, `sourmash gather` may return few or no hits.
 
 ## Amazon AWS
 
