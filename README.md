@@ -17,7 +17,6 @@ nextflow run main.nf \
   --bowtie2_samtools_only false
 ```
 
-
 ### Parameters
 
 - `--manifest` Manifest containing paths to fastq files with headers `ID,R1,R2`. (mandatory)
@@ -165,9 +164,6 @@ You must also provide an STB file built from the same reference genomes.
 Build an STB mapping file from reference FASTA headers:
 
 ```bash
-cat > /tmp/make_stb.sh <<'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
 
 for f in /path/to/refs/*.fasta; do
   bin=$(basename "$f" .fasta)
@@ -179,10 +175,7 @@ for f in /path/to/refs/*.fasta; do
       print a[1] "\t" b
     }
   ' "$f"
-done
-EOF
-
-bash /tmp/make_stb.sh > /path/to/refs/custom.stb
+done > /path/to/refs/custom.stb
 ```
 
 Then pass it to the pipeline:
