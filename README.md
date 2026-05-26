@@ -1,138 +1,175 @@
-# Abundance estimation nextflow pipeline
+# abundance_estimation
+
+[![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.04.0-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
+[![run with singularity](https://img.shields.io/badge/run%20with-singularity-1d355c.svg?labelColor=000000)](https://sylabs.io/docs/)
+
+[[_TOC_]]
+
+## Pipeline overview
+
+**abundance_estimation** is a Nextflow DSL2 pipeline for estimating the relative abundance of microbial species from metagenomic short-read data. It uses [Sourmash](https://sourmash.readthedocs.io/) for rapid genome identification, [Bowtie2](https://bowtie-bio.sourceforge.net/bowtie2/) for competitive read mapping to reference genomes, and [inStrain](https://instrain.readthedocs.io/) for strain-resolved abundance profiling.
+
+The pipeline performs the following steps:
+
+1. **QC** (optional) — adapter trimming and host read removal with MetaWrap QC (TrimGalore + BMTagger).
+2. **Read merging** — per-sample FASTQ lanes are merged.
+3. **Reference selection** — Sourmash sketches the reads and queries the GTDB genome database to identify the subset of reference genomes present in each sample.
+4. **Competitive mapping** — Bowtie2 indexes the selected reference genomes and maps reads competitively to them.
+5. **Abundance profiling** — inStrain profiles strain-level abundance from the mapping output.
 
 ## Usage
 
-```
-nextflow run main.nf
-      --manifest                      Manifest containing paths to fastq files. with headers ID,R1,R2. (mandatory)
-      --outdir                        Name of results folder. [default: ./results] (optional)
-      --instrain_full_output          Get full instrain output. [default: false] (optional)
-      --cleanup_intermediate_files    Cleanup intermediate files. [default: false] (optional)
-      --skip_qc                       Skip metawrap qc step. [default: false] (optional)
-      --stb_file                      Supply stb file. [default: /data/pam/software/GTDB/gtdb_genomes_reps_r226.stb] (optional)
-      --genome_dir                    Supply genome folder. [default: /data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226] (optional)
-      --sourmash_db                   Supply sourmash database. [default: /data/pam/software/sourmash/GTDB/release226/gtdb-rs226-reps.k31.sig.zip] (optional)
-      --instrain_quick_profile        Use quick-profile option for inStrain. [default: false] (optional)
-      --bowtie2_samtools_only         Only run bowtie2_samtools process. [default: false] (optional)
-      --help                          Print this help message. (optional)
-```
+### Quickstart
 
-## Generating manifests
+#### From source code
 
-If your data is stored in the PaM informatics pipeline system, you can use the following method:
+1. Clone this repository (including submodules):
 
-`./generate_manifest_from_lanes.sh -l <lanes_file>`
+   ```bash
+   git clone --recurse-submodules https://gitlab.internal.sanger.ac.uk/sanger-pathogens/pipelines/abundance_estimation.git
+   cd abundance_estimation
+   ```
 
-For more information, run:
-`./generate_manifest_from_lanes.sh -h`
+2. Run with `singularity`:
 
-If your data is not stored in the PaM informatics pipeline system, use the following method:
+   ```bash
+   nextflow run main.nf \
+       -profile singularity \
+       --manifest manifest.csv \
+       --outdir my_output
+   ```
 
-### Step 1:
+3. Once the run has finished, clean up intermediate files:
 
-Obtain fastq paths:
-`ls -d -1 <path>/*.fastq.gz > fastq_paths.txt`
+   ```bash
+   rm -rf work .nextflow*
+   ```
 
-### Step 2:
+#### Using on the Sanger farm
 
-Generate manifest:
-`./generate_manifest.sh fastq_paths.txt`
+Load Nextflow and Singularity:
 
-This will output the manifest to `manifest.csv` which can be fed into the nextflow pipeline
-
-## Development
-
-For development, smaller test databases are available, these will significantly reduce the run time and resource requirements:
-8 CPUs and 50GB memory will be sufficient
-
-## Dependencies
-
-This pipeline relies on the following modules:
-
-```
-nextflow/22.10
-ISG/singularity/3.6.4
+```bash
+module load nextflow ISG/singularity
 ```
 
-## Resource requirements
+Submit to LSF:
 
-`bowtie2samtools` - 250GB ( ~2hr) submits with 250Gb and then on retry escalate to 350Gb, 8 CPUs
-
-`inStrain` - 300 GB ( ~ 12hr) submits with 300Gb then on retry escalates to 400Gb, 8 CPUs
-
-It’s not particularly uncommon for these things to run out of memory, so they do need to retry on a few samples for each run
-
-## Custom sourmash database generation
-
-To begin you need to have a set of input genomic sequences:
-
-```
-GCA_900538355.1.fasta
-GCA_900549805.1.fasta
-GCA_900550455.1.fasta
+```bash
+bsub -o output.o -e error.e -q oversubscribed -R "select[mem>4000] rusage[mem=4000]" -M4000 \
+    nextflow run main.nf \
+        --manifest manifest.csv \
+        --outdir my_output
 ```
 
-In this example the extention is `.fasta`
+### Input
 
-To generate a sourmash database from these files, you first need to produce a sketch for each input fasta:
+#### Manifest (`--manifest`)
 
-```
-sourmash sketch dna -p scaled=1000,k=31 db/*.fasta
-```
-
-This will produce a collection of signature files ending in `.sig`:
+A CSV file with the required header `ID,R1,R2`, containing per-sample paths to paired `.fastq.gz` files:
 
 ```
-GCA_900538355.1.fasta.sig
-GCA_900549805.1.fasta.sig
-GCA_900550455.1.fasta.sig
+ID,R1,R2
+sampleA,/path/to/sampleA_1.fastq.gz,/path/to/sampleA_2.fastq.gz
+sampleB,/path/to/sampleB_1.fastq.gz,/path/to/sampleB_2.fastq.gz
 ```
 
-This pipeline requires that the name of the signal within the signal file is the same as the basename of the file i.e.
+### Output
+
+Results are written to `--outdir` (default: `./results`):
 
 ```
-GCA_900538355.1
+results/
+  <sample_ID>/
+    instrain/                        # inStrain profiling output
+      output/
+        <sample_ID>_genome_info.tsv  # Per-genome abundance and coverage
+        <sample_ID>_mapping_info.tsv # Per-read mapping details
+  bowtie2/
+    <sample_ID>.bam                  # Sorted BAM file (competitive mapping)
+    <sample_ID>.overall_mapping_rate.txt
+  sourmash/
+    <sample_ID>_gather.csv           # Sourmash gather results (genome matches)
 ```
 
-This can be produced using the command `sourmash signature rename` included in the sourmash package.
+### Parameters
 
-To rename a collection of signature file you can use the following commands. First list the files into a list to use to rename:
+| Option | Type | Default | Description |
+| --- | --- | --- | --- |
+| `--manifest` | `path` | (required) | Input manifest CSV with header `ID,R1,R2`. |
+| `--outdir` | `path` | `./results` | Directory where results are written. |
+| `--skip_qc` | `boolean` | `false` | Skip MetaWrap QC (adapter trimming and host read removal). |
+| `--stb_file` | `path` | `/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb` | Sample-to-bin (STB) mapping file for inStrain. |
+| `--genome_dir` | `path` | `/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226` | Directory containing GTDB reference genome FASTAs. |
+| `--sourmash_db` | `path` | `/data/pam/software/sourmash/signatures_zipped/gtdb_genomes_reps_r220.zip` | Sourmash genome signature database. |
+| `--instrain_full_output` | `boolean` | `false` | Publish full inStrain output (large). |
+| `--instrain_quick_profile` | `boolean` | `false` | Use inStrain `quick_profile` mode (faster, less detail). |
+| `--bowtie2_samtools_only` | `boolean` | `false` | Run only Bowtie2 mapping and Samtools steps, skipping inStrain. |
+| `--cleanup_intermediate_files` | `boolean` | `false` | Delete intermediate files (trimmed FASTQs, sorted BAMs) after use. |
 
-```
-ls *.sig > filelist
-```
+### Advanced usage
 
-Then run a loop over this list using the sourmash script to rename the signature to the filename:
+#### Mapping only (no inStrain)
 
-```
-cat filelist | while read line;
-do
-    NAME=$(basename "$line" .fasta.sig)
-    echo $NAME
-    sourmash signature rename $NAME.fasta.sig "$NAME" -o $NAME.sig
-done
-```
+To generate BAM files without running inStrain (useful for downstream analysis or to reduce compute):
 
-Once complete, index the output signature files into an indexed record:
-
-```
-sourmash index -k 31 all-genomes *.sig
-```
-
-Supply the index as an argument to the pipeline option `--sourmash_db`.
-
-In this scenario you will also need to include the following option (specifying the file extension of the input sequences that were used to build the sourmash index):
-
-```
---genomes_file_ext .fasta
+```bash
+nextflow run main.nf --manifest manifest.csv --bowtie2_samtools_only true --outdir my_output
 ```
 
-And point to the genome dir where the .fasta files are stored:
+#### Skipping host removal and trimming
 
+If reads have already been quality-controlled:
+
+```bash
+nextflow run main.nf --manifest manifest.csv --skip_qc true --outdir my_output
 ```
---genome_dir <path_to_fasta_files>
+
+#### Using a custom Sourmash database
+
+Supply your own Sourmash signature database and matching genome directory:
+
+```bash
+nextflow run main.nf \
+    --manifest manifest.csv \
+    --sourmash_db /path/to/custom.sig.zip \
+    --genome_dir /path/to/genomes \
+    --stb_file /path/to/custom.stb \
+    --outdir my_output
 ```
 
-## Amazon AWS
+See the existing README for instructions on building a custom Sourmash database.
 
-See [the AWS README](README.aws.md).
+### Dependencies
+
+All software dependencies are containerised. The following databases must be available (Sanger HPC defaults are pre-configured):
+
+- **Sourmash database** (`--sourmash_db`): GTDB genome signature zip file.
+- **Reference genome directory** (`--genome_dir`): directory of GTDB reference FASTA files.
+- **STB file** (`--stb_file`): sample-to-bin mapping file required by inStrain.
+- **BMTagger database**: required when `--skip_qc false` (host read removal). Pre-configured on the Sanger HPC.
+
+**Resource requirements**: Bowtie2 mapping requires ~250 GB RAM; inStrain requires ~300 GB RAM. These processes will automatically retry with increased memory on failure.
+
+## Software versions
+
+| Software | Version | Image |
+| --- | --- | --- |
+| Sourmash | 4.5.0 | `quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0` |
+| Bowtie2 + Samtools | — | `quay.io/sangerpathogens/bowtie2-samtools:1.1-c1` |
+| inStrain | 1.9.0 | `quay.io/sangerpathogens/instrain:1.9.0` |
+
+See `modules/` for pinned container versions.
+
+## Troubleshooting
+
+- **Out-of-memory errors**: Bowtie2 and inStrain are very memory-intensive. The pipeline is configured to retry with more memory on failure. Ensure the HPC queue has nodes with sufficient RAM (>300 GB).
+- **Sourmash finds no matches**: ensure `--sourmash_db` and `--genome_dir` are consistent (same GTDB release). Check that reads are of sufficient quality and depth.
+- **Resuming a failed run**: add `-resume` to restart from cached intermediate results. Note: if `--cleanup_intermediate_files true` is set, files deleted in earlier runs cannot be reused.
+- For further help, check `.nextflow.log` and the per-process logs in the `work/` directory.
+
+## Issues and Contributions
+
+If you find an issue with this pipeline, or would like to suggest an improvement, please log an issue or open a pull request on this repository.
+
+If you are at Sanger and need internal support, you can raise an issue on the PAM Freshservice portal: https://sanger.freshservice.com/support/catalog/items/426
