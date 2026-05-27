@@ -94,18 +94,18 @@ results/
 
 ### Parameters
 
-| Option | Type | Default | Description |
-| --- | --- | --- | --- |
-| `--manifest` | `path` | (required) | Input manifest CSV with header `ID,R1,R2`. |
-| `--outdir` | `path` | `./results` | Directory where results are written. |
-| `--skip_qc` | `boolean` | `false` | Skip MetaWrap QC (adapter trimming and host read removal). |
-| `--stb_file` | `path` | `/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb` | Sample-to-bin (STB) mapping file for inStrain. |
-| `--genome_dir` | `path` | `/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226` | Directory containing GTDB reference genome FASTAs. |
-| `--sourmash_db` | `path` | `/data/pam/software/sourmash/signatures_zipped/gtdb_genomes_reps_r220.zip` | Sourmash genome signature database. |
-| `--instrain_full_output` | `boolean` | `false` | Publish full inStrain output (large). |
-| `--instrain_quick_profile` | `boolean` | `false` | Use inStrain `quick_profile` mode (faster, less detail). |
-| `--bowtie2_samtools_only` | `boolean` | `false` | Run only Bowtie2 mapping and Samtools steps, skipping inStrain. |
-| `--cleanup_intermediate_files` | `boolean` | `false` | Delete intermediate files (trimmed FASTQs, sorted BAMs) after use. |
+| Option                         | Type      | Default                                                                        | Description                                                        |
+| ------------------------------ | --------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `--manifest`                   | `path`    | (required)                                                                     | Input manifest CSV with header `ID,R1,R2`.                         |
+| `--outdir`                     | `path`    | `./results`                                                                    | Directory where results are written.                               |
+| `--skip_qc`                    | `boolean` | `false`                                                                        | Skip MetaWrap QC (adapter trimming and host read removal).         |
+| `--stb_file`                   | `path`    | `/data/pam/software/GTDB/gtdb_genomes_reps_r226.stb`                           | Sample-to-bin (STB) mapping file for inStrain.                     |
+| `--genome_dir`                 | `path`    | `/data/pam/software/GTDB/release226/genomic_files_reps/gtdb_genomes_reps_r226` | Directory containing GTDB reference genome FASTAs.                 |
+| `--sourmash_db`                | `path`    | `/data/pam/software/sourmash/signatures_zipped/gtdb_genomes_reps_r220.zip`     | Sourmash genome signature database.                                |
+| `--instrain_full_output`       | `boolean` | `false`                                                                        | Publish full inStrain output (large).                              |
+| `--instrain_quick_profile`     | `boolean` | `false`                                                                        | Use inStrain `quick_profile` mode (faster, less detail).           |
+| `--bowtie2_samtools_only`      | `boolean` | `false`                                                                        | Run only Bowtie2 mapping and Samtools steps, skipping inStrain.    |
+| `--cleanup_intermediate_files` | `boolean` | `false`                                                                        | Delete intermediate files (trimmed FASTQs, sorted BAMs) after use. |
 
 ### Advanced usage
 
@@ -153,11 +153,11 @@ All software dependencies are containerised. The following databases must be ava
 
 ## Software versions
 
-| Software | Version | Image |
-| --- | --- | --- |
-| Sourmash | 4.5.0 | `quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0` |
-| Bowtie2 + Samtools | — | `quay.io/sangerpathogens/bowtie2-samtools:1.1-c1` |
-| inStrain | 1.9.0 | `quay.io/sangerpathogens/instrain:1.9.0` |
+| Software           | Version | Image                                              |
+| ------------------ | ------- | -------------------------------------------------- |
+| Sourmash           | 4.5.0   | `quay.io/biocontainers/sourmash:4.5.0--hdfd78af_0` |
+| Bowtie2 + Samtools | —       | `quay.io/sangerpathogens/bowtie2-samtools:1.1-c1`  |
+| inStrain           | 1.9.0   | `quay.io/sangerpathogens/instrain:1.9.0`           |
 
 See `modules/` for pinned container versions.
 
