@@ -5,11 +5,11 @@
 Create a fasta file containing fasta sequences from the sourmash matches
 """
 
-import sys 
+import gzip
 import os
 import re
-import gzip
 import shutil
+import sys
 
 
 def subset_fasta(genome_dir, sourmash_genomes):
@@ -20,9 +20,9 @@ def subset_fasta(genome_dir, sourmash_genomes):
 
     # Open the sourmash genomes file and the output subset fasta file
     genome_dir = genome_dir.strip()
-    with open(sourmash_genomes, 'r') as sourmash_file, open('subset_ref_database.fasta', 'ab') as subset_file:
+    with open(sourmash_genomes, "r") as sourmash_file, open("subset_ref_database.fasta", "ab") as subset_file:
         # Iterate through each genome file name in the sourmash file
-        for genome_file_name in sourmash_file: 
+        for genome_file_name in sourmash_file:
             genome_file_name = genome_file_name.strip()
             # Only execute if directory is in a GCF pattern
             if not_GCF_pattern:
@@ -33,7 +33,7 @@ def subset_fasta(genome_dir, sourmash_genomes):
                 print("file path: ", genome_file_path)
             if os.path.exists(genome_file_path) and not_GCF_pattern:
                 try:
-                    with gzip.open(genome_file_path, 'rb') as genome_file:
+                    with gzip.open(genome_file_path, "rb") as genome_file:
                         shutil.copyfileobj(genome_file, subset_file)
                 except FileNotFoundError as e:
                     print(f"Error {genome_file_path} not found: {e}")
@@ -47,7 +47,7 @@ def subset_fasta(genome_dir, sourmash_genomes):
                     if genome_file_name in files:
                         genome_file_path = os.path.join(root, genome_file_name)
                         try:
-                            with gzip.open(genome_file_path, 'rb') as genome_file:
+                            with gzip.open(genome_file_path, "rb") as genome_file:
                                 shutil.copyfileobj(genome_file, subset_file)
                         except FileNotFoundError as e:
                             print(f"Error {genome_file_path} not found: {e}")
@@ -57,9 +57,11 @@ def subset_fasta(genome_dir, sourmash_genomes):
 
 if __name__ == "__main__":
     if len(sys.argv) != 3:
-        raise TypeError(f"two() takes 2 positional arguments but {len(sys.argv)-1} were given\nUsage: {sys.argv[0]} <genome_dir> <sourmash_genomes>")
+        raise TypeError(
+            f"two() takes 2 positional arguments but {len(sys.argv)-1} were given\n"
+            f"Usage: {sys.argv[0]} <genome_dir> <sourmash_genomes>"
+        )
         sys.exit(1)
-
 
     genome_dir = sys.argv[1]
     sourmash_genomes = sys.argv[2]
