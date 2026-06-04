@@ -170,7 +170,9 @@ See `modules/` for pinned container versions.
 - **Out-of-memory errors**: Bowtie2 and inStrain are very memory-intensive. The pipeline is configured to retry with more memory on failure. Ensure the HPC queue has nodes with sufficient RAM (>300 GB).
 - **Sourmash finds no matches**: ensure `--sourmash_db` and `--genome_dir` are consistent (same GTDB release). Check that reads are of sufficient quality and depth.
 - **Resuming a failed run**: add `-resume` to restart from cached intermediate results. Note: if `--cleanup_intermediate_files true` is set, files deleted in earlier runs cannot be reused.
-- For further help, check `.nextflow.log` and the per-process logs in the `work/` directory.
+- For further help, check `.nextflow.log` and the per-process `.command.log` logs in the `work/` directory.
+
+Sanger users may find [this page](https://ssg-confluence.internal.sanger.ac.uk/spaces/PaMI/pages/181078206/General+pipeline+info#Generalpipelineinfo-Troubleshootingafailedpipelinerunandsendingabugreport) useful for troubleshooting Nextflow pipeline runs.
 
 ## Issues and Contributions
 
