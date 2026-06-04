@@ -84,16 +84,20 @@ Results are written to `--outdir` (default: `./results`):
 
 ```
 results/
-  <sample_ID>/
-    instrain/                        # inStrain profiling output
-      output/
-        <sample_ID>_genome_info.tsv  # Per-genome abundance and coverage
-        <sample_ID>_mapping_info.tsv # Per-read mapping details
-  bowtie2/
-    <sample_ID>.bam                  # Sorted BAM file (competitive mapping)
-    <sample_ID>.overall_mapping_rate.txt
-  sourmash/
-    <sample_ID>_gather.csv           # Sourmash gather results (genome matches)
+  <sample_ID>_genome_info.tsv                    # Per-genome inStrain abundance (default mode)
+  <sample_ID>_instrain_output/                   # Full inStrain output directory (if --instrain_full_output)
+  <sample_ID>_instrain_quick_profile_output/     # Quick-profile output directory (if --instrain_quick_profile)
+  <sample_ID>.sorted.bam                         # Sorted BAM file (if --bowtie2_samtools_only)
+  mapping_rates/
+    <timestamp>_mapping_rates.csv                # Per-sample Bowtie2 mapping rates
+  metawrap_qc/                                   # Only present when --skip_qc is false
+    read_removal_statistics.csv                  # Host read removal statistics
+    cleaned_reads/
+      <sample_ID>_clean_1.fastq.gz               # Host-removed reads (R1)
+      <sample_ID>_clean_2.fastq.gz               # Host-removed reads (R2)
+  host_reads/                                    # Only present when --publish_host_reads is true
+    <sample_ID>_host_1.fastq.gz                  # Reads mapping to host (R1)
+    <sample_ID>_host_2.fastq.gz                  # Reads mapping to host (R2)
 ```
 
 ### Parameters
