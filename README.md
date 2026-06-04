@@ -45,6 +45,8 @@ The pipeline performs the following steps:
    rm -rf work .nextflow*
    ```
 
+   Alternatively, use `nextflow clean` for more fine-grained control over which runs and intermediate files are removed.
+
 #### Using on the Sanger farm
 
 Load Nextflow and Singularity:
